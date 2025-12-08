@@ -1,0 +1,380 @@
+import { User, Sparkles, Code, Check, Copy, Lightbulb, ArrowUp, ArrowDown } from 'lucide-react';
+import { WolfLogo } from '../atoms/WolfLogo';
+import { useState, useRef, useEffect, memo, useCallback, useMemo, useDeferredValue } from 'react';
+import type { Message } from '../../types/chat';
+import { TypingIndicator } from '../atoms/TypingIndicator';
+import { Button } from '../atoms/Buttons';
+
+import { ImmersiveMessage } from '../molecules/ImmersiveMessage';
+import Logger from '../../utils/logger';
+import ReactMarkdown from 'react-markdown';
+import { CodeBlock } from '../atoms/CodeBlock';
+import { SophisticatedHr } from '../atoms/SophisticatedHr';
+import { MotionReveal } from '../atoms/MotionReveal';
+
+
+const AnimatedMarkdown = memo(({ text, shouldAnimate, onReveal }: { text: string; shouldAnimate: boolean; onReveal?: (el: HTMLElement) => void }) => {
+  const components = useMemo(() => ({
+    hr: () => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal}>
+        <SophisticatedHr />
+      </MotionReveal>
+    ),
+    p: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal} className="mb-4">
+        <p className="whitespace-pre-wrap">{children}</p>
+      </MotionReveal>
+    ),
+    h1: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal} className="mb-4">
+        <h1 className="text-2xl font-bold">{children}</h1>
+      </MotionReveal>
+    ),
+    h2: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal} className="mb-3">
+        <h2 className="text-xl font-bold">{children}</h2>
+      </MotionReveal>
+    ),
+    h3: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal} className="mb-2">
+        <h3 className="text-lg font-bold">{children}</h3>
+      </MotionReveal>
+    ),
+    ul: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal} className="mb-4">
+        <ul className="list-disc pl-6 space-y-2 marker:text-brand-500">{children}</ul>
+      </MotionReveal>
+    ),
+    ol: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal} className="mb-4">
+        <ol className="list-decimal pl-6 space-y-2 marker:text-brand-500 marker:font-bold">{children}</ol>
+      </MotionReveal>
+    ),
+    li: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal}>
+        <li className="pl-1 leading-relaxed text-white/90">{children}</li>
+      </MotionReveal>
+    ),
+    code({ node, inline, className, children, ...props }: any) {
+      const match = /language-(\w+)/.exec(className || '');
+      if (!inline && match) {
+        return (
+          <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal}>
+            <CodeBlock
+              language={match[1]}
+              value={String(children).replace(/\n$/, '')}
+            />
+          </MotionReveal>
+        );
+      }
+      return (
+        <code className={`${className} bg-white/10 rounded px-1 py-0.5 text-xs md:text-sm font-mono text-brand-200`} {...props}>
+          {children}
+        </code>
+      );
+    }
+  }), [shouldAnimate, onReveal]);
+
+  return <ReactMarkdown components={components}>{text}</ReactMarkdown>;
+});
+
+
+interface ChatAreaProps {
+  messages: Message[];
+  onPromptClick: (text: string) => void;
+  chatTitle?: string;
+
+  isImmersive: boolean;
+}
+
+const stripImmersiveTags = (text: string): string => {
+  const immersiveTags = ['technical-term', 'highlight', 'obs', 'text', 'title', 'subtitle', 'warning', 'quote', 'terminal', 'banner', 'mark'];
+  let cleanText = text;
+  for (const tag of immersiveTags) {
+    const regex = new RegExp(`<${tag}[^>]*?>([\\s\\S]*?)</${tag}>`, 'g');
+    cleanText = cleanText.replace(regex, '$1');
+  }
+  return cleanText;
+};
+
+const processMessageContent = (text: string): string => {
+  return text;
+};
+
+
+
+interface MessageItemProps {
+  message: Message;
+  isHovered: boolean;
+  isCopied: boolean;
+  onHover: (id: number | null) => void;
+  onCopy: (text: string, id: number) => void;
+
+  isImmersive: boolean;
+  shouldAnimate: boolean;
+  onReveal?: (el: HTMLElement) => void;
+}
+
+const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImmersive, shouldAnimate, onReveal }: MessageItemProps) => {
+  const processedText = useMemo(() => 
+    message.sender === 'bot' && message.text ? processMessageContent(message.text) : message.text,
+    [message.text, message.sender]
+  );
+  
+
+
+  const handleMouseEnter = useCallback(() => onHover(message.id), [message.id, onHover]);
+  const handleMouseLeave = useCallback(() => onHover(null), [onHover]);
+  const handleCopy = useCallback(() => onCopy(message.text, message.id), [message.text, message.id, onCopy]);
+
+  const isBot = message.sender === 'bot';
+
+  if (!isBot) {
+    return (
+      <div 
+        className="flex gap-3 md:gap-6 flex-row-reverse max-w-full"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1 shadow-lg bg-surface-card text-white/80">
+          <User size={20} className="w-5 h-5 md:w-auto md:h-auto" />
+        </div>
+
+        <div className="max-w-[85%] bg-surface-card p-4 md:p-6 rounded-2xl border border-white/10 shadow-xl ml-auto">
+          <div className="prose prose-invert max-w-none text-white/90 leading-relaxed text-base break-words w-full overflow-hidden min-w-0">
+            <p className="whitespace-pre-wrap">{processedText}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="flex flex-col md:flex-row gap-2 md:gap-3 items-start max-w-full"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="flex items-center gap-2 md:gap-3 shrink-0">
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white">
+          <div className="w-full h-full p-1.5"><WolfLogo className="w-full h-full text-white" /></div>
+        </div>
+        <div className="text-sm font-bold text-white tracking-wide md:hidden">WolfChat</div>
+      </div>
+
+      <div className="flex-1 px-2 md:px-0 min-w-0 w-full max-w-full">
+        
+        <div className="prose prose-invert max-w-none text-white/90 leading-relaxed text-base break-words w-full min-w-0">
+          {!message.text ? (
+            <TypingIndicator />
+          ) : (
+            <>
+              {isImmersive ? (
+                <ImmersiveMessage content={message.text || ''} shouldAnimate={shouldAnimate} onReveal={onReveal} />
+              ) : (
+                <AnimatedMarkdown text={processedText} shouldAnimate={shouldAnimate} onReveal={onReveal} />
+              )}
+              
+
+            </>
+          )}
+        </div>
+
+        {message.text && (
+          <div className={`mt-4 flex items-center gap-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+            <Button 
+              variant="outline" 
+              className="text-xs h-8 px-3 rounded-full border-white/20 text-white/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
+              leftIcon={isCopied ? <Check size={14} /> : <Copy size={14} />}
+              onClick={handleCopy}
+            >
+              {isCopied ? 'Copiado' : 'Copiar'}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive }: ChatAreaProps) => {
+  const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+  
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isUserScrollingRef = useRef<boolean>(false);
+  
+  const [initialMessageIds] = useState(() => new Set(messages.map(m => m.id)));
+
+  const deferredMessages = useDeferredValue(messages);
+
+  const isNearBottom = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return true;
+    const threshold = 150;
+    return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (isUserScrollingRef.current) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (isNearBottom()) {
+      scrollToBottom();
+    }
+  }, [messages, isNearBottom, scrollToBottom]);
+
+  const copyToClipboard = useCallback(async (text: string, id: number) => {
+    try {
+      const cleanText = stripImmersiveTags(text);
+      await navigator.clipboard.writeText(cleanText);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (error) {
+      Logger.error('Failed to copy text: ', error);
+    }
+  }, []);
+
+  const handleManualScrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    isUserScrollingRef.current = false;
+  }, []);
+
+  const handleManualScrollToTop = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    container.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    isUserScrollingRef.current = !isNearBottom();
+    
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const scrollRange = scrollHeight - clientHeight;
+    
+    if (scrollRange > 0) {
+      const scrollRatio = scrollTop / scrollRange;
+      setShowScrollTop(scrollRatio > 0.5);
+      setShowScrollBottom(scrollRatio <= 0.5 && scrollRange > 100); // Only show if there is actually content to scroll
+    } else {
+      setShowScrollTop(false);
+      setShowScrollBottom(false);
+    }
+  }, [isNearBottom]);
+
+  const handleHover = useCallback((id: number | null) => {
+    setHoveredMessageId(id);
+  }, []);
+
+
+
+
+
+  return (
+    <div className="flex-1 relative w-full h-full max-w-full overflow-x-hidden">
+
+      {chatTitle && (
+        <div className="absolute top-20 md:top-24 left-0 right-0 z-30 flex justify-center pointer-events-none">
+           <div className="bg-surface-main/60 backdrop-blur-xl border border-white/10 px-4 py-1.5 rounded-full shadow-2xl transition-all duration-300">
+              <h2 className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase max-w-[200px] truncate">{chatTitle}</h2>
+           </div>
+        </div>
+      )}
+
+      <div className="absolute right-4 md:right-8 bottom-32 md:bottom-36 z-50 flex flex-col gap-3 pointer-events-none">
+        {showScrollTop && (
+          <button
+            onClick={handleManualScrollToTop}
+            className="pointer-events-auto p-3 rounded-full bg-surface-card/80 backdrop-blur-md border border-white/10 text-white/70 hover:text-brand-500 hover:border-brand-500 hover:bg-surface-hover shadow-lg transition-all duration-300 hover:scale-110"
+            aria-label="Rolar para o topo"
+          >
+            <ArrowUp size={20} />
+          </button>
+        )}
+        {showScrollBottom && (
+          <button
+            onClick={handleManualScrollToBottom}
+            className="pointer-events-auto p-3 rounded-full bg-surface-card/80 backdrop-blur-md border border-white/10 text-white/70 hover:text-brand-500 hover:border-brand-500 hover:bg-surface-hover shadow-lg transition-all duration-300 hover:scale-110"
+            aria-label="Rolar para o fim"
+          >
+            <ArrowDown size={20} />
+          </button>
+        )}
+      </div>
+
+      <div 
+        ref={scrollContainerRef}
+        className={`relative w-full h-full min-h-0 pt-24 md:pt-32 pb-36 md:pb-40 px-3 md:px-4 scrollbar-thin scrollbar-thumb-surface-card scrollbar-track-transparent flex flex-col overflow-x-hidden ${deferredMessages.length === 0 ? 'overflow-hidden' : 'overflow-y-auto'}`}
+        onScroll={handleScroll}
+      >
+      {deferredMessages.length === 0 ? (
+        <div className="flex flex-col items-center justify-center flex-1 text-center p-4 md:p-8 min-h-0">
+             <div className="relative mb-4 md:mb-8">
+                 <div className="absolute inset-[-20px] bg-brand-500/20 blur-xl rounded-full" />
+                 <div className="w-16 h-16 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-2xl shadow-brand-500/30 relative overflow-hidden p-4">
+                    <WolfLogo className="w-full h-full text-white" />
+                 </div>
+             </div>
+             
+             <h1 className="text-3xl md:text-4xl text-white mb-2 md:mb-4 font-black tracking-tight">
+                WolfChat
+             </h1>
+             <p className="text-white/60 max-w-lg mb-6 md:mb-12 text-base md:text-xl leading-relaxed">
+                Seu assistente de IA avançado. <br />
+                <span className="text-brand-500 font-semibold">O que vamos criar juntos?</span>
+             </p>
+
+             <div className="grid grid-cols-2 lg:flex lg:flex-wrap justify-center gap-2 md:gap-4 max-w-4xl w-full">
+                {[ 
+                  { icon: Sparkles, text: "Explique computação quântica" },
+                  { icon: Code, text: "Script Python para automação" },
+                  { icon: User, text: "Simule uma entrevista" },
+                  { icon: Lightbulb, text: "Ideias para um app inovador" }
+                ].map((item, index) => (
+                  <button 
+                    key={index}
+                    onClick={() => onPromptClick(item.text)}
+                    className="flex flex-col items-center gap-2 md:gap-3 flex-1 min-w-0 text-center p-3 md:p-6 rounded-2xl bg-surface-card border border-white/10 text-white/90 hover:border-brand-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                  >
+                    <item.icon size={20} className="text-brand-500 md:mb-1 w-5 h-5 md:w-6 md:h-6" />
+                    <span className="text-xs md:text-base font-medium leading-snug truncate w-full">{item.text}</span>
+                  </button>
+                ))}
+             </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-6 md:gap-8 max-w-4xl mx-auto w-full">
+          {deferredMessages.map((message) => (
+             <MessageItem
+                key={message.id}
+                message={message}
+                isHovered={hoveredMessageId === message.id}
+                isCopied={copiedId === message.id}
+                onHover={handleHover}
+                onCopy={copyToClipboard}
+
+                isImmersive={isImmersive}
+                shouldAnimate={!initialMessageIds.has(message.id) && message.sender === 'bot'}
+                onReveal={undefined}
+              />
+          ))}
+        </div>
+      )}
+      <div ref={messagesEndRef} />
+      </div>
+    </div>
+  );
+});
