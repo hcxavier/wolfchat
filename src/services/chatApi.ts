@@ -54,8 +54,6 @@ AVAILABLE TAGS:
 - <quote> text </quote> : Use for quotes or emphasized statements.
 - <terminal> text </terminal> : Use for terminal commands. (Dark terminal window). IMPORTANT: This tag has a block appearance and is not inline content.
 - <banner> text </banner> : Use for a large, decorative title at the start of the response.
-- <ul> <li>item</li> </ul> : Use for bullet points.
-- <ol> <li>item</li> </ol> : Use for numbered lists.
 
 FOR CODE BLOCKS:
 - Use standard markdown triple backticks with language specification. Example:
