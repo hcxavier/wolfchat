@@ -45,7 +45,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const [groqApiKey, setGroqApiKey] = useState<string>('');
   const [geminiApiKey, setGeminiApiKey] = useState<string>('');
   
-  const [selectedModel, setSelectedModelState] = useState<string>('groq/llama-3.3-70b-versatile');
+  const [selectedModel, setSelectedModelState] = useState<string>('groq/moonshotai/kimi-k2-instruct-0905');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('default');
   const [userName, setUserName] = useState<string>('Usuário');
 
