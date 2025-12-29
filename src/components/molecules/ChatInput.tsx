@@ -1,4 +1,4 @@
-import { Send, Square } from 'lucide-react';
+import { Send, Square, Quote, X } from 'lucide-react';
 import { useState, useRef, useEffect, type KeyboardEvent, memo } from 'react';
 
 interface ChatInputProps {
@@ -6,13 +6,15 @@ interface ChatInputProps {
   prefilledValue?: string;
   isGenerating?: boolean;
   onStopGeneration?: () => void;
+  quotedText?: string | null;
+  onClearQuote?: () => void;
 }
 
 
 
 
 
-export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, onStopGeneration }: ChatInputProps) => {
+export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, onStopGeneration, quotedText, onClearQuote }: ChatInputProps) => {
   const [value, setValue] = useState('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -26,6 +28,12 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
       }
     }
   }, [prefilledValue]);
+
+  useEffect(() => {
+    if (quotedText && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [quotedText]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
@@ -70,13 +78,24 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
     }
   };
 
-
-
-
-
   return (
     <div className="fixed md:absolute bottom-0 left-0 right-0 pb-1 md:pb-6 pt-10 px-4 z-20 bg-gradient-to-t from-surface-main via-surface-main to-transparent">
       <div className="max-w-3xl mx-auto">
+        {quotedText && (
+          <div className="mb-2 mx-2 p-3 bg-surface-card/80 backdrop-blur-md border-l-4 border-brand-500 rounded-r-lg shadow-lg flex items-start gap-3 animate-in slide-in-from-bottom-2 duration-300">
+             <Quote className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
+             <div className="flex-1 min-w-0">
+               <p className="text-sm font-medium text-brand-200 mb-0.5">Citando trecho no context</p>
+               <p className="text-white/70 text-sm line-clamp-2 italic">{quotedText}</p>
+             </div>
+             <button 
+               onClick={onClearQuote}
+               className="p-1 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-colors"
+             >
+               <X size={14} />
+             </button>
+          </div>
+        )}
         <div className="relative group">
           <textarea
             ref={textareaRef}

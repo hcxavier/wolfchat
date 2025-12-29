@@ -1,4 +1,4 @@
-import { User, Sparkles, Code, Check, Copy, Lightbulb, ArrowUp, ArrowDown } from 'lucide-react';
+import { User, Sparkles, Code, Check, Copy, Lightbulb, ArrowUp, ArrowDown, MessageSquarePlus } from 'lucide-react';
 import { WolfLogo } from '../atoms/WolfLogo';
 import { useState, useRef, useEffect, memo, useCallback, useMemo, useDeferredValue } from 'react';
 import type { Message } from '../../types/chat';
@@ -83,8 +83,8 @@ interface ChatAreaProps {
   messages: Message[];
   onPromptClick: (text: string) => void;
   chatTitle?: string;
-
   isImmersive: boolean;
+  onQuote: (text: string) => void;
 }
 
 const stripImmersiveTags = (text: string): string => {
@@ -142,7 +142,16 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImm
 
         <div className="max-w-[85%] bg-surface-card p-4 md:p-6 rounded-2xl border border-white/10 shadow-xl ml-auto">
           <div className="prose prose-invert max-w-none text-white/90 leading-relaxed text-base break-words w-full overflow-hidden min-w-0">
-            <p className="whitespace-pre-wrap">{processedText}</p>
+             {processedText.split('\n').map((line, i) => {
+               if (line.startsWith('> ')) {
+                 return (
+                   <blockquote key={i} className="border-l-4 border-brand-500 pl-4 py-1 my-2 bg-white/5 rounded-r italic text-white/70">
+                     {line.substring(2)}
+                   </blockquote>
+                 );
+               }
+               return <p key={i} className="whitespace-pre-wrap mb-2 last:mb-0">{line}</p>;
+             })}
           </div>
         </div>
       </div>
@@ -197,9 +206,11 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImm
   );
 });
 
-export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive }: ChatAreaProps) => {
+export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive, onQuote }: ChatAreaProps) => {
   const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [selectionMenu, setSelectionMenu] = useState<{ x: number, y: number, text: string } | null>(null);
+
   
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
@@ -268,7 +279,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive 
     if (scrollRange > 0) {
       const scrollRatio = scrollTop / scrollRange;
       setShowScrollTop(scrollRatio > 0.5);
-      setShowScrollBottom(scrollRatio <= 0.5 && scrollRange > 100); // Only show if there is actually content to scroll
+      setShowScrollBottom(scrollRatio <= 0.5 && scrollRange > 100); 
     } else {
       setShowScrollTop(false);
       setShowScrollBottom(false);
@@ -279,12 +290,93 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive 
     setHoveredMessageId(id);
   }, []);
 
+  useEffect(() => {
+    const handleSelection = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) { 
+        
+        return; 
+      }
+
+      const text = selection.toString().trim();
+      if (!text) {
+         setSelectionMenu(null);
+         return;
+      }
+      
+      
+      const range = selection.getRangeAt(0);
+      const rects = range.getClientRects();
+      if(rects.length === 0) return;
+      
+      const rect = rects[0]; 
+      
+      
+      
+      
+      setSelectionMenu({
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10,
+        text
+      });
+    };
+
+    
+    const onMouseUp = () => {
+        
+        setTimeout(() => {
+             const selection = window.getSelection();
+             if (!selection || selection.isCollapsed) {
+                 setSelectionMenu(null);
+                 return;
+             }
+             
+             const text = selection.toString().trim();
+             if (text.length > 0) {
+                 handleSelection();
+             } else {
+                 setSelectionMenu(null);
+             }
+        }, 10);
+    }
+
+    document.addEventListener('mouseup', onMouseUp);
+    return () => document.removeEventListener('mouseup', onMouseUp);
+  }, []);
+
+  const handleQuoteClick = useCallback(() => {
+    if (selectionMenu) {
+      onQuote(selectionMenu.text);
+      setSelectionMenu(null);
+      window.getSelection()?.removeAllRanges();
+    }
+  }, [selectionMenu, onQuote]);
+
 
 
 
 
   return (
     <div className="flex-1 relative w-full h-full max-w-full overflow-x-hidden">
+      
+      {selectionMenu && (
+        <div 
+            className="fixed z-[100] transform -translate-x-1/2 -translate-y-full"
+            style={{ 
+                left: selectionMenu.x, 
+                top: selectionMenu.y - 10 
+            }}
+        >
+            <button
+                onClick={handleQuoteClick}
+                className="flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-full shadow-2xl border border-white/10 backdrop-blur-md animate-in fade-in zoom-in duration-200"
+            >
+                <MessageSquarePlus size={16} />
+                <span className="text-sm font-medium whitespace-nowrap">Perguntar ao WolfChat</span>
+            </button>
+            <div className="w-3 h-3 bg-brand-600 absolute left-1/2 -bottom-1.5 transform -translate-x-1/2 rotate-45 border-r border-b border-white/10"></div>
+        </div>
+      )}
 
       {chatTitle && (
         <div className="absolute top-20 md:top-24 left-0 right-0 z-30 flex justify-center pointer-events-none">

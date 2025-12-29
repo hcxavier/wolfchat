@@ -32,6 +32,7 @@ function App() {
   const { selectedModel, selectedLanguage } = useModelSettings();
   
   const [prefilledText, setPrefilledText] = useState<string | undefined>(undefined);
+  const [quotedText, setQuotedText] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
   const [isImmersive, setIsImmersive] = useState(false);
 
@@ -92,9 +93,15 @@ function App() {
   const handleSendMessage = useCallback(async (text: string) => {
     if (!text.trim()) return;
   
+    let finalMessageText = text;
+    if (quotedText) {
+      finalMessageText = `> ${quotedText}\n\n${text}`;
+      setQuotedText(null);
+    }
+  
     const userMessage: Message = { 
       id: Date.now(), 
-      text: text, 
+      text: finalMessageText, 
       sender: 'user', 
       timestamp: new Date() 
     };
@@ -208,7 +215,7 @@ function App() {
       setIsGenerating(false);
       abortControllerRef.current = null;
     }
-  }, [messages, currentChatId, updateChatHistory, updateChatMessages, selectedModel, groqApiKey, geminiApiKey, openRouterApiKey, isImmersive, selectedLanguage, setMessages, renameChat]);
+  }, [messages, currentChatId, updateChatHistory, updateChatMessages, selectedModel, groqApiKey, geminiApiKey, openRouterApiKey, isImmersive, selectedLanguage, setMessages, renameChat, quotedText]);
 
   return (
     <div className="flex h-full bg-surface-main overflow-hidden text-white font-sans selection:bg-brand-500/30">
@@ -240,6 +247,7 @@ function App() {
             chatTitle={currentChatTitle}
 
             isImmersive={isImmersive}
+            onQuote={setQuotedText}
           />
 
           <ChatInput 
@@ -247,6 +255,8 @@ function App() {
             prefilledValue={prefilledText}
             isGenerating={isGenerating}
             onStopGeneration={handleStopGeneration}
+            quotedText={quotedText}
+            onClearQuote={() => setQuotedText(null)}
           />
         </div>
 
