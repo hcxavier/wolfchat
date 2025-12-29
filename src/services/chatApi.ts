@@ -64,7 +64,7 @@ def hello():
 This ensures correct syntax highlighting and indentation preservation.
 `;
 
-  let baseSystemPrompt = `You are WolfChat, a helpful AI assistant. Your function is explain complex concepts in a simple way. `;
+  let baseSystemPrompt = `You are WolfChat, a helpful AI assistant.`;
   
   if (selectedLanguage !== 'default') {
     baseSystemPrompt += ` Please respond in ${selectedLanguage}.`;
@@ -102,7 +102,7 @@ This ensures correct syntax highlighting and indentation preservation.
 
     } catch (error: any) {
        if (error.message && (error.message.includes('429') || error.status === 429)) {
-          throw new Error('Limite de requisições excedido (Erro 429). O modelo Gemini 3.0 Pro Preview possui limites restritos de uso. Aguarde alguns instantes e tente novamente.');
+          throw new Error(`Limite de requisições excedido (Erro 429). O modelo ${modelId} possui limites restritos de uso. Aguarde alguns instantes e tente novamente.`);
        }
        if (error.message && error.message.includes('overloaded')) {
           throw new Error(`O modelo está sobrecarregado no momento. Tente novamente em alguns segundos. (Detalhes: ${error.message})`);
