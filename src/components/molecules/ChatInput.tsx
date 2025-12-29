@@ -16,8 +16,41 @@ interface ChatInputProps {
 
 export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, onStopGeneration, quotedText, onClearQuote }: ChatInputProps) => {
   const [value, setValue] = useState('');
+  const [bottomOffset, setBottomOffset] = useState(0);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    
+    if (!window.visualViewport) return;
+
+    const handleVisualViewportResize = () => {
+      const visualViewport = window.visualViewport;
+      if (!visualViewport) return;
+
+      const windowHeight = window.innerHeight;
+      const viewportHeight = visualViewport.height;
+      const offsetTop = visualViewport.offsetTop;
+
+      const diff = windowHeight - viewportHeight - offsetTop;
+      
+      if (diff > 20) {
+        setBottomOffset(diff);
+      } else {
+        setBottomOffset(0);
+      }
+    };
+
+    handleVisualViewportResize();
+
+    window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+    window.visualViewport.addEventListener('scroll', handleVisualViewportResize);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleVisualViewportResize);
+      window.visualViewport?.removeEventListener('scroll', handleVisualViewportResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (prefilledValue) {
@@ -79,7 +112,10 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
   };
 
   return (
-    <div className="fixed md:absolute bottom-0 left-0 right-0 pb-1 md:pb-6 pt-10 px-4 z-20 bg-gradient-to-t from-surface-main via-surface-main to-transparent">
+    <div 
+      className="fixed md:absolute bottom-0 left-0 right-0 pb-[max(4px,env(safe-area-inset-bottom))] md:pb-6 pt-10 px-4 z-20 bg-gradient-to-t from-surface-main via-surface-main to-transparent transition-[bottom] duration-75"
+      style={{ bottom: `${bottomOffset}px` }}
+    >
       <div className="max-w-3xl mx-auto">
         {quotedText && (
           <div className="mb-2 mx-2 p-3 bg-surface-card/80 backdrop-blur-md border-l-4 border-brand-500 rounded-r-lg shadow-lg flex items-start gap-3 animate-in slide-in-from-bottom-2 duration-300">
@@ -98,6 +134,7 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
         )}
         <div className="relative group">
           <textarea
+            id="chat-input"
             ref={textareaRef}
             value={value}
             onChange={(e) => {
@@ -105,11 +142,17 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
               adjustHeight(e.target);
             }}
             onKeyDown={handleKeyDown}
-            placeholder={"Envie uma mensagem..."}
-            className="w-full bg-surface-input/50 border border-transparent hover:bg-surface-input hover:border-white/20 focus:bg-surface-input focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-2xl pl-4 pr-12 md:pr-36 py-5 text-white placeholder-white/40 text-sm md:text-base resize-none outline-none shadow-xl transition-all duration-200 overflow-hidden min-h-[60px] max-h-[200px]"
+            placeholder="Envie uma mensagem..."
+            className="peer w-full bg-surface-input/50 border border-transparent hover:bg-surface-input hover:border-white/20 focus:bg-surface-input focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-white placeholder-transparent text-sm md:text-base resize-none outline-none shadow-xl transition-all duration-200 overflow-hidden min-h-[60px] max-h-[200px]"
             rows={1}
             disabled={isGenerating}
           />
+          <label
+            htmlFor="chat-input"
+            className="absolute left-4 top-5 px-1 text-sm md:text-base text-white/40 transition-opacity duration-200 opacity-0 peer-placeholder-shown:opacity-100 pointer-events-none"
+          >
+            Envie uma mensagem...
+          </label>
           <div className="absolute right-3 bottom-5 flex items-center gap-2">
 
 

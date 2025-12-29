@@ -149,14 +149,18 @@ This ensures correct syntax highlighting and indentation preservation.
 
   if (reader) {
     try {
+      let buffer = '';
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n').filter(line => line.trim() !== '');
+        buffer += chunk;
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
+          if (line.trim() === '') continue;
           if (line === 'data: [DONE]') return fullContent;
           
           if (line.startsWith('data: ')) {

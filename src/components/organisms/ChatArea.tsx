@@ -1,6 +1,6 @@
 import { User, Sparkles, Code, Check, Copy, Lightbulb, ArrowUp, ArrowDown, MessageSquarePlus } from 'lucide-react';
 import { WolfLogo } from '../atoms/WolfLogo';
-import { useState, useRef, useEffect, memo, useCallback, useMemo, useDeferredValue } from 'react';
+import { useState, useRef, useEffect, memo, useCallback, useMemo } from 'react';
 import type { Message } from '../../types/chat';
 import { TypingIndicator } from '../atoms/TypingIndicator';
 import { Button } from '../atoms/Buttons';
@@ -221,7 +221,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
   
   const [initialMessageIds] = useState(() => new Set(messages.map(m => m.id)));
 
-  const deferredMessages = useDeferredValue(messages);
+
 
   const isNearBottom = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -409,11 +409,11 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
 
       <div 
         ref={scrollContainerRef}
-        className={`relative w-full h-full min-h-0 pt-24 md:pt-32 pb-36 md:pb-40 px-3 md:px-4 scrollbar-thin scrollbar-thumb-surface-card scrollbar-track-transparent flex flex-col overflow-x-hidden ${deferredMessages.length === 0 ? 'overflow-hidden' : 'overflow-y-auto'}`}
+        className={`relative w-full h-full min-h-0 scrollbar-thin scrollbar-thumb-surface-card scrollbar-track-transparent flex flex-col overflow-x-hidden ${messages.length === 0 ? 'overflow-hidden p-4 items-center justify-center' : 'overflow-y-auto pt-24 md:pt-32 pb-36 md:pb-40 px-3 md:px-4'}`}
         onScroll={handleScroll}
       >
-      {deferredMessages.length === 0 ? (
-        <div className="flex flex-col items-center justify-center flex-1 text-center p-4 md:p-8 min-h-0">
+      {messages.length === 0 ? (
+        <div className="flex flex-col items-center justify-center flex-1 text-center min-h-0 w-full max-w-4xl mx-auto my-auto pb-20">
              <div className="relative mb-4 md:mb-8">
                  <div className="absolute inset-[-20px] bg-brand-500/20 blur-xl rounded-full" />
                  <div className="w-16 h-16 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-2xl shadow-brand-500/30 relative overflow-hidden p-4">
@@ -449,7 +449,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
         </div>
       ) : (
         <div className="flex flex-col gap-6 md:gap-8 max-w-4xl mx-auto w-full">
-          {deferredMessages.map((message) => (
+          {messages.map((message) => (
              <MessageItem
                 key={message.id}
                 message={message}
