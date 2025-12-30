@@ -238,14 +238,22 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
   
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isUserScrollingRef = useRef<boolean>(false);
+  const scrollTimeoutRef = useRef<any>(null);
   
   const [initialMessageIds] = useState(() => new Set(messages.map(m => m.id)));
 
-
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const isNearBottom = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -294,6 +302,14 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
   const handleScroll = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
+
+    setIsScrolling(true);
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+    }, 1500);
 
     isUserScrollingRef.current = !isNearBottom();
     
@@ -410,7 +426,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
         </div>
       )}
 
-      <div className="absolute right-4 md:right-8 bottom-32 md:bottom-36 z-50 flex flex-col gap-3 pointer-events-none">
+      <div className={`absolute right-4 md:right-8 bottom-32 md:bottom-36 z-50 flex flex-col gap-3 pointer-events-none transition-opacity duration-300 ${isScrolling ? 'opacity-100' : 'opacity-0'}`}>
         {showScrollTop && (
           <button
             onClick={handleManualScrollToTop}

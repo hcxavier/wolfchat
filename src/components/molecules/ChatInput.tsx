@@ -11,10 +11,6 @@ interface ChatInputProps {
   onClearQuote?: () => void;
 }
 
-
-
-
-
 export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, onStopGeneration, quotedText, onClearQuote }: ChatInputProps) => {
   const [value, setValue] = useState('');
   const [bottomOffset, setBottomOffset] = useState(0);
