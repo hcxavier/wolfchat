@@ -1,5 +1,6 @@
 import { Send, Square, Quote, X } from 'lucide-react';
 import { useState, useRef, useEffect, type KeyboardEvent, memo } from 'react';
+import { motion } from 'framer-motion';
 
 interface ChatInputProps {
   onSendMessage: (text: string) => void;
@@ -17,8 +18,10 @@ interface ChatInputProps {
 export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, onStopGeneration, quotedText, onClearQuote }: ChatInputProps) => {
   const [value, setValue] = useState('');
   const [bottomOffset, setBottomOffset] = useState(0);
+  const [textareaHeight, setTextareaHeight] = useState(60);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const shadowRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     
@@ -57,10 +60,16 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
       setValue(prefilledValue);
       if (textareaRef.current) {
         textareaRef.current.focus();
-        adjustHeight(textareaRef.current);
       }
     }
   }, [prefilledValue]);
+
+  useEffect(() => {
+    if (shadowRef.current) {
+      const newHeight = Math.min(Math.max(shadowRef.current.scrollHeight, 60), 200);
+      setTextareaHeight(newHeight);
+    }
+  }, [value]);
 
   useEffect(() => {
     if (quotedText && textareaRef.current) {
@@ -84,10 +93,7 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
-  const adjustHeight = (element: HTMLTextAreaElement) => {
-    element.style.height = 'auto';
-    element.style.height = `${Math.min(element.scrollHeight, 200)}px`;
-  };
+
 
   const handleSend = () => {
     if (!value.trim()) return;
@@ -99,7 +105,6 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
  
     
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
       textareaRef.current.blur();
     }
   };
@@ -133,19 +138,28 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
           </div>
         )}
         <div className="relative group">
-          <textarea
+          <motion.textarea
             id="chat-input"
             ref={textareaRef}
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-              adjustHeight(e.target);
-            }}
+            onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Envie uma mensagem..."
-            className="peer w-full bg-surface-input/50 border border-transparent hover:bg-surface-input hover:border-white/20 focus:bg-surface-input focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-white placeholder-transparent text-sm md:text-base resize-none outline-none shadow-xl transition-all duration-200 overflow-hidden min-h-[60px] max-h-[200px]"
+            initial={{ height: 60 }}
+            animate={{ height: textareaHeight }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="peer w-full bg-surface-input/50 border border-transparent hover:bg-surface-input hover:border-white/20 focus:bg-surface-input focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-white placeholder-transparent text-sm md:text-base resize-none outline-none shadow-xl overflow-y-auto no-scrollbar min-h-[60px] max-h-[200px]"
             rows={1}
             disabled={isGenerating}
+          />
+
+          <textarea
+            ref={shadowRef}
+            value={value}
+            readOnly
+            aria-hidden
+            className="absolute -z-50 invisible w-full bg-transparent border border-transparent rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-white text-sm md:text-base resize-none outline-none min-h-[60px] max-h-[200px] overflow-hidden"
+            rows={1}
           />
           <label
             htmlFor="chat-input"
