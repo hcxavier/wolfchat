@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
-import { availableModels } from '../../utils/constants';
+import { availableModels, modelAliases } from '../../utils/constants';
 import { Button } from '../atoms/Buttons';
 
 interface ModelSelectorProps {
@@ -22,6 +22,10 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const getModelName = (modelId: string) => {
+    return modelAliases[modelId] || modelId.replace(/^(groq\/|openrouter\/|gemini\/)/, '');
+  };
+
   return (
     <div className="relative shrink-0" ref={dropdownRef}>
       <Button 
@@ -30,7 +34,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="truncate block uppercase tracking-tight">
-          {selectedModel.replace(/^(groq\/|openrouter\/|gemini\/)/, '')}
+          {getModelName(selectedModel)}
         </span>
         <ChevronDown size={12} className="shrink-0 ml-1 opacity-50" />
       </Button>
@@ -47,7 +51,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
               }}
             >
               <span>
-                {model.replace(/^(groq\/|openrouter\/|gemini\/)/, '')}
+                {getModelName(model)}
               </span>
               {selectedModel === model && <Check size={14} className="text-brand-500" />}
             </button>

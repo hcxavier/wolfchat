@@ -207,7 +207,7 @@ export const generateChatTitle = async (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'moonshotai/kimi-k2-instruct-0905',
         messages: [
           {
             role: 'system',
