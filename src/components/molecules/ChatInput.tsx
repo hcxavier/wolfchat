@@ -19,6 +19,7 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
   const [value, setValue] = useState('');
   const [bottomOffset, setBottomOffset] = useState(0);
   const [textareaHeight, setTextareaHeight] = useState(60);
+  const [isFocused, setIsFocused] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const shadowRef = useRef<HTMLTextAreaElement>(null);
@@ -66,10 +67,15 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
 
   useEffect(() => {
     if (shadowRef.current) {
-      const newHeight = Math.min(Math.max(shadowRef.current.scrollHeight, 60), 200);
-      setTextareaHeight(newHeight);
+      const contentHeight = Math.min(Math.max(shadowRef.current.scrollHeight, 60), 200);
+      
+      if (isFocused) {
+        setTextareaHeight(contentHeight);
+      } else {
+        setTextareaHeight(60);
+      }
     }
-  }, [value]);
+  }, [value, isFocused]);
 
   useEffect(() => {
     if (quotedText && textareaRef.current) {
@@ -143,6 +149,8 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
             ref={textareaRef}
             value={value}
             onChange={(e) => setValue(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onKeyDown={handleKeyDown}
             placeholder="Envie uma mensagem..."
             initial={{ height: 60 }}
