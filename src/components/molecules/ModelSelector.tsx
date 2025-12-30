@@ -30,7 +30,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     <div className="relative shrink-0" ref={dropdownRef}>
       <Button 
         variant="outline"
-        className="text-[11px] font-bold py-1.5 px-2.5 h-auto bg-white/5 border border-white/10 rounded-full hover:bg-white/10 max-w-[100px] sm:max-w-[200px] transition-all"
+        className="text-[11px] font-bold py-1.5 px-2.5 h-auto bg-white/5 border border-white/10 rounded-full hover:bg-white/10 max-w-[150px] sm:max-w-[250px] transition-all"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="truncate block uppercase tracking-tight">
