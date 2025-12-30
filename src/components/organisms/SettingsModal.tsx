@@ -1,4 +1,5 @@
-import { X, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { X, Trash2, ChevronRight, ArrowLeft } from 'lucide-react';
 import { Button } from '../atoms/Buttons';
 import { useSettingsModal, useApiKeys, useModelSettings, useUserSettings, useSettingsActions } from '../../hooks/useSettings';
 
@@ -12,6 +13,7 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
   const { selectedLanguage, setSelectedLanguage } = useModelSettings();
   const { userName, setUserName } = useUserSettings();
   const { saveSettings } = useSettingsActions();
+  const [showApiKeys, setShowApiKeys] = useState(false);
 
   if (!showSettings) return null;
 
@@ -50,36 +52,76 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80">OpenRouter API Key</label>
-            <input 
-              type="password"
-              value={openRouterApiKey}
-              onChange={(e) => setOpenRouterApiKey(e.target.value)}
-              className="w-full bg-surface-main/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-all placeholder-white/20"
-              placeholder="sk-or-..."
-            />
+            <button
+              onClick={() => setShowApiKeys(true)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-surface-main/50 border border-white/10 rounded-xl hover:bg-surface-main transition-all text-left group"
+            >
+              <span className="text-sm font-medium text-white/80">Configurar API Keys</span>
+              <span className="text-white/50 group-hover:text-white transition-colors">
+                <ChevronRight size={16} />
+              </span>
+            </button>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80">Groq API Key</label>
-            <input 
-              type="password"
-              value={groqApiKey}
-              onChange={(e) => setGroqApiKey(e.target.value)}
-              className="w-full bg-surface-main/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-500 focus:ring-1 focus:ring-500 outline-none transition-all placeholder-white/20"
-              placeholder="gsk_..."
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80">Gemini API Key</label>
-            <input 
-              type="password"
-              value={geminiApiKey}
-              onChange={(e) => setGeminiApiKey(e.target.value)}
-              className="w-full bg-surface-main/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-500 focus:ring-1 focus:ring-500 outline-none transition-all placeholder-white/20"
-              placeholder="AIza..."
-            />
-            <p className="text-xs text-white/40">Suas chaves são armazenadas localmente.</p>
-          </div>
+
+
+          {showApiKeys && (
+             <div className="absolute inset-0 z-20 bg-surface-card animate-in slide-in-from-right duration-200 flex flex-col">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 shrink-0">
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setShowApiKeys(false)}
+                    className="text-white/50 hover:text-white transition-colors"
+                  >
+                    <ArrowLeft size={20} />
+                  </button>
+                  <h2 className="text-lg font-bold text-white">API Keys</h2>
+                </div>
+                <button onClick={() => setShowApiKeys(false)} className="text-white/50 hover:text-white transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-5 overflow-y-auto flex-1">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white/80">OpenRouter API Key</label>
+                  <input 
+                    type="password"
+                    value={openRouterApiKey}
+                    onChange={(e) => setOpenRouterApiKey(e.target.value)}
+                    className="w-full bg-surface-main/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-all placeholder-white/20"
+                    placeholder="sk-or-..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white/80">Groq API Key</label>
+                  <input 
+                    type="password"
+                    value={groqApiKey}
+                    onChange={(e) => setGroqApiKey(e.target.value)}
+                    className="w-full bg-surface-main/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-500 focus:ring-1 focus:ring-500 outline-none transition-all placeholder-white/20"
+                    placeholder="gsk_..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white/80">Gemini API Key</label>
+                  <input 
+                    type="password"
+                    value={geminiApiKey}
+                    onChange={(e) => setGeminiApiKey(e.target.value)}
+                    className="w-full bg-surface-main/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-500 focus:ring-1 focus:ring-500 outline-none transition-all placeholder-white/20"
+                    placeholder="AIza..."
+                  />
+                  <p className="text-xs text-white/40">Suas chaves são armazenadas localmente.</p>
+                </div>
+              </div>
+
+               <div className="flex justify-end px-6 py-4 border-t border-white/5 bg-white/5 shrink-0">
+                  <Button onClick={() => setShowApiKeys(false)} variant="solid" className="px-6 py-2 h-auto text-xs md:text-sm">
+                    Concluído
+                  </Button>
+               </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-white/80">Idioma da Resposta</label>
