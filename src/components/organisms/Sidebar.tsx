@@ -1,4 +1,4 @@
-import { X, Plus, Settings, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Settings, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { WolfLogo } from '../atoms/WolfLogo';
 import { useState, useEffect, useRef, memo, useCallback, useMemo } from 'react';
 import type { ChatSession } from '../../types/chat';
@@ -155,7 +155,7 @@ export const Sidebar = memo(({
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/30 flex-shrink-0 overflow-hidden p-1.5">
             <WolfLogo className="w-full h-full text-white" />
           </div>
-          <div>
+          <div className="mt-2 flex flex-col justify-center gap-0.5">
             <h1 className="font-extrabold text-xl tracking-tight text-white leading-none">WolfChat</h1>
             <span className="text-xs font-semibold text-brand-500 tracking-wider">PRO</span>
           </div>
@@ -169,7 +169,7 @@ export const Sidebar = memo(({
           className="lg:hidden absolute right-5 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
           onClick={handleCloseSidebar}
         >
-          <X size={24} />
+          <ChevronLeft size={24} />
         </button>
       </div>
 
