@@ -140,18 +140,31 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImm
           <User size={20} className="w-5 h-5 md:w-auto md:h-auto" />
         </div>
 
-        <div className="max-w-[85%] bg-surface-card p-4 md:p-6 rounded-2xl border border-white/10 shadow-xl ml-auto">
-          <div className="prose prose-invert max-w-none text-white/90 leading-relaxed text-base break-words w-full overflow-hidden min-w-0">
-             {processedText.split('\n').map((line, i) => {
-               if (line.startsWith('> ')) {
-                 return (
-                   <blockquote key={i} className="border-l-4 border-brand-500 pl-4 py-1 my-2 bg-white/5 rounded-r italic text-white/70">
-                     {line.substring(2)}
-                   </blockquote>
-                 );
-               }
-               return <p key={i} className="whitespace-pre-wrap mb-2 last:mb-0">{line}</p>;
-             })}
+        <div className="flex flex-col items-end max-w-[85%] ml-auto gap-2">
+           <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+              <Button 
+                variant="outline" 
+                className="text-xs h-7 px-2.5 rounded-full border-white/20 text-white/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
+                leftIcon={isCopied ? <Check size={12} /> : <Copy size={12} />}
+                onClick={handleCopy}
+              >
+                {isCopied ? 'Copiado' : 'Copiar'}
+              </Button>
+           </div>
+           
+           <div className="bg-surface-card p-4 md:p-6 rounded-2xl border border-white/10 shadow-xl w-full">
+            <div className="prose prose-invert max-w-none text-white/90 leading-relaxed text-base break-words w-full overflow-hidden min-w-0">
+               {processedText.split('\n').map((line, i) => {
+                 if (line.startsWith('> ')) {
+                   return (
+                     <blockquote key={i} className="border-l-4 border-brand-500 pl-4 py-1 my-2 bg-white/5 rounded-r italic text-white/70">
+                       {line.substring(2)}
+                     </blockquote>
+                   );
+                 }
+                 return <p key={i} className="whitespace-pre-wrap mb-2 last:mb-0">{line}</p>;
+               })}
+            </div>
           </div>
         </div>
       </div>
