@@ -217,6 +217,88 @@ function App() {
     }
   }, [messages, currentChatId, updateChatHistory, updateChatMessages, selectedModel, groqApiKey, geminiApiKey, openRouterApiKey, isImmersive, selectedLanguage, setMessages, renameChat, quotedText]);
 
+  const handleRegenerateMessage = useCallback(async (messageId: number) => {
+    const messageIndex = messages.findIndex(m => m.id === messageId);
+    if (messageIndex === -1 || messages[messageIndex].sender !== 'bot') return;
+    
+    if (isGenerating) handleStopGeneration();
+
+    const truncatedMessages = messages.slice(0, messageIndex);
+    setMessages(truncatedMessages);
+
+    if (currentChatId) {
+         updateChatMessages(currentChatId, truncatedMessages);
+    }
+
+    const isGroq = selectedModel.startsWith('groq/');
+    const isGemini = selectedModel.startsWith('gemini/');
+    const currentApiKey = isGroq ? groqApiKey : (isGemini ? geminiApiKey : openRouterApiKey);
+
+    if (!currentApiKey) {
+         const errorMessage: Message = {
+            id: Date.now() + 1, 
+            text: `Por favor, configure sua chave API ${isGroq ? 'do Groq' : (isGemini ? 'do Gemini' : 'do OpenRouter')} nas configurações.`, 
+            sender: "bot",
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, errorMessage]);
+          return;
+    }
+
+    const botThinkingMessageId = Date.now() + 1;
+    
+    setMessages(prev => [
+        ...prev,
+        {
+            id: botThinkingMessageId,
+            text: "",
+            sender: "bot",
+            timestamp: new Date()
+        }
+    ]);
+
+    setIsGenerating(true);
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    try {
+        let currentResponse = "";
+        await sendMessageToApi(
+            truncatedMessages,
+            selectedModel,
+            currentApiKey,
+            isImmersive,
+            selectedLanguage,
+            abortController.signal,
+            (chunk) => {
+                 currentResponse += chunk;
+                 setMessages(prev => prev.map(m => m.id === botThinkingMessageId ? { ...m, text: currentResponse } : m));
+            }
+        );
+        
+        setMessages(prev => {
+            const newMessages = prev.map(m => m.id === botThinkingMessageId ? { ...m, text: currentResponse } : m);
+            if (currentChatId) updateChatMessages(currentChatId, newMessages);
+            return newMessages;
+        });
+
+    } catch (error: any) {
+         if (error.name === 'AbortError') {
+            setMessages(prev => prev.map(m => m.id === botThinkingMessageId ? { ...m, text: m.text || "🛑 Resposta interrompida pelo usuário." } : m));
+         } else {
+            setMessages(prev => {
+               const newMsgs = prev.map(m => m.id === botThinkingMessageId ? { ...m, text: `Erro: ${error.message}` } : m);
+               if (currentChatId) updateChatMessages(currentChatId, newMsgs);
+               return newMsgs;
+            });
+         }
+    } finally {
+        setIsGenerating(false);
+        abortControllerRef.current = null;
+    }
+
+  }, [messages, currentChatId, updateChatMessages, selectedModel, groqApiKey, geminiApiKey, openRouterApiKey, isImmersive, selectedLanguage, handleStopGeneration, isGenerating]);
+
   return (
     <div className="flex h-full bg-surface-main overflow-hidden text-white font-sans selection:bg-brand-500/30">
       <Sidebar 
@@ -248,6 +330,7 @@ function App() {
 
             isImmersive={isImmersive}
             onQuote={setQuotedText}
+            onRegenerate={handleRegenerateMessage}
           />
 
           <ChatInput 

@@ -1,4 +1,4 @@
-import { User, Sparkles, Code, Check, Copy, Lightbulb, ArrowUp, ArrowDown, MessageSquarePlus } from 'lucide-react';
+import { User, Sparkles, Code, Check, Copy, Lightbulb, ArrowUp, ArrowDown, MessageSquarePlus, RotateCcw } from 'lucide-react';
 import { WolfLogo } from '../atoms/WolfLogo';
 import { useState, useRef, useEffect, memo, useCallback, useMemo } from 'react';
 import type { Message } from '../../types/chat';
@@ -85,6 +85,7 @@ interface ChatAreaProps {
   chatTitle?: string;
   isImmersive: boolean;
   onQuote: (text: string) => void;
+  onRegenerate: (id: number) => void;
 }
 
 const stripImmersiveTags = (text: string): string => {
@@ -109,13 +110,14 @@ interface MessageItemProps {
   isCopied: boolean;
   onHover: (id: number | null) => void;
   onCopy: (text: string, id: number) => void;
+  onRegenerate: (id: number) => void;
 
   isImmersive: boolean;
   shouldAnimate: boolean;
   onReveal?: (el: HTMLElement) => void;
 }
 
-const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImmersive, shouldAnimate, onReveal }: MessageItemProps) => {
+const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onRegenerate, isImmersive, shouldAnimate, onReveal }: MessageItemProps) => {
   const processedText = useMemo(() => 
     message.sender === 'bot' && message.text ? processMessageContent(message.text) : message.text,
     [message.text, message.sender]
@@ -126,6 +128,7 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImm
   const handleMouseEnter = useCallback(() => onHover(message.id), [message.id, onHover]);
   const handleMouseLeave = useCallback(() => onHover(null), [onHover]);
   const handleCopy = useCallback(() => onCopy(message.text, message.id), [message.text, message.id, onCopy]);
+  const handleRegenerate = useCallback(() => onRegenerate(message.id), [message.id, onRegenerate]);
 
   const isBot = message.sender === 'bot';
 
@@ -203,7 +206,7 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImm
         </div>
 
         {message.text && (
-          <div className={`mt-4 flex items-center gap-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="mt-4 flex items-center gap-3">
             <Button 
               variant="outline" 
               className="text-xs h-8 px-3 rounded-full border-white/20 text-white/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
@@ -212,6 +215,14 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImm
             >
               {isCopied ? 'Copiado' : 'Copiar'}
             </Button>
+            <Button
+              variant="outline"
+              className="text-xs h-8 px-3 rounded-full border-white/20 text-white/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
+              leftIcon={<RotateCcw size={14} />}
+              onClick={handleRegenerate}
+            >
+              Gerar novamente
+            </Button>
           </div>
         )}
       </div>
@@ -219,7 +230,7 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, isImm
   );
 });
 
-export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive, onQuote }: ChatAreaProps) => {
+export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive, onQuote, onRegenerate }: ChatAreaProps) => {
   const [hoveredMessageId, setHoveredMessageId] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [selectionMenu, setSelectionMenu] = useState<{ x: number, y: number, text: string } | null>(null);
@@ -474,6 +485,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
                 isImmersive={isImmersive}
                 shouldAnimate={!initialMessageIds.has(message.id) && message.sender === 'bot'}
                 onReveal={undefined}
+                onRegenerate={onRegenerate}
               />
           ))}
         </div>
