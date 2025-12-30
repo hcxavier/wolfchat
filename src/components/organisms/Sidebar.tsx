@@ -147,7 +147,7 @@ export const Sidebar = memo(({
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 lg:left-auto lg:inset-y-auto lg:relative z-40 transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] bg-surface-card lg:m-4 lg:rounded-2xl shadow-2xl overflow-hidden flex flex-col lg:h-[calc(100vh-32px)] border-r border-white/5 ${mobileTransform}`}
+        className={`fixed inset-y-0 left-0 lg:left-auto lg:inset-y-auto lg:relative z-40 transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] bg-surface-card lg:m-4 lg:rounded-2xl lg:shadow-2xl overflow-hidden flex flex-col lg:h-[calc(100vh-32px)] border-r border-white/5 ${mobileTransform}`}
         style={sidebarStyle}
       >
       <div className="flex items-center justify-between p-4 lg:p-5 relative min-h-[60px] lg:min-h-[80px]">

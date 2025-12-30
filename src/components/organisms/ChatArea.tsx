@@ -381,7 +381,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
 
 
   return (
-    <div className="flex-1 relative w-full h-full max-w-full overflow-x-hidden">
+    <div className="flex-1 relative w-full h-full max-w-full">
       
       {selectionMenu && (
         <div 
