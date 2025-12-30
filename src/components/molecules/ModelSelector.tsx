@@ -26,8 +26,19 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     return modelAliases[modelId] || modelId.replace(/^(groq\/|openrouter\/|gemini\/)/, '');
   };
 
+  const getProviderName = (modelId: string) => {
+    if (modelId.startsWith('gemini/')) return 'GOOGLE';
+    if (modelId.startsWith('groq/')) return 'GROQ';
+    if (modelId.startsWith('openrouter/')) return 'OPENROUTER';
+    return 'AI PROVIDER';
+  };
+
   return (
     <div className="relative shrink-0" ref={dropdownRef}>
+      <div className="absolute -top-2 right-2 text-[9px] font-black text-brand-500 pointer-events-none select-none tracking-widest z-10">
+        {getProviderName(selectedModel)}
+      </div>
+
       <Button 
         variant="outline"
         className="text-[11px] font-bold py-1.5 px-2.5 h-auto bg-white/5 border border-white/10 rounded-full hover:bg-white/10 max-w-[150px] sm:max-w-[250px] transition-all"
@@ -50,9 +61,14 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                 setIsOpen(false);
               }}
             >
-              <span>
-                {getModelName(model)}
-              </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[9px] font-black text-brand-500 uppercase tracking-widest leading-none">
+                  {getProviderName(model)}
+                </span>
+                <span className="font-medium">
+                  {getModelName(model)}
+                </span>
+              </div>
               {selectedModel === model && <Check size={14} className="text-brand-500" />}
             </button>
           ))}
