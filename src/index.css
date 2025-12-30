@@ -2,10 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  background-color: #2b2c30;
-  color: #fff;
-  font-family: 'Montserrat', sans-serif;
+@layer base {
+  :root {
+    --surface-main: 242 243 245;
+    --surface-card: 250 250 250;
+    --surface-input: 228 230 233;
+    --surface-hover: 235 237 240;
+    
+    --text-primary: 38 38 38;
+    --text-secondary: 82 82 82;
+    
+    --accent-light: 97 60 76;
+    --accent-dark: 203 213 225;
+
+    --scrollbar-thumb: 212 212 212;
+    --scrollbar-thumb-hover: 163 163 163;
+  }
+
+  .dark {
+    --surface-main: 43 44 48;
+    --surface-card: 53 49 59;
+    --surface-input: 69 55 69;
+    --surface-hover: 62 57 69;
+    
+    --text-primary: 255 255 255;
+    --text-secondary: 156 163 175;
+    
+    --accent-light: 97 60 76;
+    --accent-dark: 30 30 32;
+
+    --scrollbar-thumb: 53 49 59;
+    --scrollbar-thumb-hover: 97 60 76;
+  }
 }
 
 html, body {
@@ -16,6 +44,9 @@ html, body {
   overflow: hidden;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
+  background-color: rgb(var(--surface-main));
+  color: rgb(var(--text-primary));
+  font-family: 'Montserrat', sans-serif;
 }
 
 #root {
@@ -33,12 +64,12 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #35313b;
+  background: rgb(var(--scrollbar-thumb));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #613c4c;
+  background: rgb(var(--scrollbar-thumb-hover));
 }
 
 @layer utilities {

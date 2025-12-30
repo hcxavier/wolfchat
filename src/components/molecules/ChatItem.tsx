@@ -44,7 +44,7 @@ export const ChatItem = memo(({
   const handleDelete = useCallback((e: React.MouseEvent) => onDelete(chat.id, e), [onDelete, chat.id]);
 
   const containerClass = useMemo(() => 
-    `relative group w-full flex items-center gap-3 px-4 py-3 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-200 cursor-pointer ${isActive ? "bg-white/10 text-white" : "text-white/60 lg:hover:bg-white/5 lg:hover:text-white"} ${isCollapsed ? "justify-center px-0" : ""} ${menuOpenId === chat.id ? "z-50" : ""} ${className}`,
+    `relative group w-full flex items-center gap-3 px-4 py-3 lg:py-3 rounded-lg lg:rounded-xl transition-colors duration-200 cursor-pointer ${isActive ? "bg-primary/10 text-primary" : "text-primary/60 lg:hover:bg-primary/5 lg:hover:text-primary"} ${isCollapsed ? "justify-center px-0" : ""} ${menuOpenId === chat.id ? "z-50" : ""} ${className}`,
     [isActive, isCollapsed, menuOpenId, chat.id, className]
   );
 
@@ -54,7 +54,7 @@ export const ChatItem = memo(({
   );
 
   const menuToggleClass = useMemo(() => 
-    `p-2 lg:p-1 rounded-lg transition-colors ${menuOpenId === chat.id ? "bg-white/10 text-white" : "lg:hover:bg-white/10 text-white/60 lg:hover:text-white"}`,
+    `p-2 lg:p-1 rounded-lg transition-colors ${menuOpenId === chat.id ? "bg-primary/10 text-primary" : "lg:hover:bg-primary/10 text-primary/60 lg:hover:text-primary"}`,
     [menuOpenId, chat.id]
   );
 
@@ -80,7 +80,7 @@ export const ChatItem = memo(({
                 onChange={onTitleChange}
                 onKeyDown={handleKeyDownCallback}
                 onClick={stopPropagation}
-                className="flex-1 bg-black/40 text-white text-xs rounded px-2 py-1 outline-none border border-brand-500/50"
+                className="flex-1 bg-surface-main/80 text-primary text-xs rounded px-2 py-1 outline-none border border-brand-500/50"
               />
             </div>
           ) : (
@@ -94,20 +94,20 @@ export const ChatItem = memo(({
                 {menuOpenId === chat.id && (
                   <div 
                     ref={menuRef}
-                    className="absolute right-0 top-full mt-1 z-[100] w-32 bg-[#1a1a1a] border border-white/20 rounded-xl shadow-2xl overflow-hidden isolate pointer-events-auto"
+                    className="absolute right-0 top-full mt-1 z-[100] w-32 bg-surface-card border border-primary/20 rounded-xl shadow-2xl overflow-hidden isolate pointer-events-auto"
                     onClick={stopPropagation}
                     onMouseDown={stopPropagation}
                     onMouseUp={stopPropagation}
                   >
                     <button
                       onClick={handleStartEdit}
-                      className="w-full text-left px-4 py-3 lg:py-2.5 text-sm lg:text-xs text-white/90 hover:bg-brand-500/20 hover:text-white flex items-center gap-2 transition-colors"
+                      className="w-full text-left px-4 py-3 lg:py-2.5 text-sm lg:text-xs text-primary/90 hover:bg-brand-500/20 hover:text-primary flex items-center gap-2 transition-colors"
                     >
                       <Pencil size={14} className="lg:w-3 lg:h-3" /> Renomear
                     </button>
                       <button
                         onClick={handleDelete}
-                        className="w-full text-left px-4 py-3 lg:py-2.5 text-sm lg:text-xs text-red-400 hover:bg-red-500/20 hover:text-red-300 flex items-center gap-2 transition-colors"
+                        className="w-full text-left px-4 py-3 lg:py-2.5 text-sm lg:text-xs text-red-500 hover:bg-red-500/10 hover:text-red-600 flex items-center gap-2 transition-colors"
                       >
                         <Trash2 size={14} className="lg:w-3 lg:h-3" /> Excluir
                       </button>

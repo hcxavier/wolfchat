@@ -52,7 +52,7 @@ const AnimatedMarkdown = memo(({ text, shouldAnimate, onReveal }: { text: string
     ),
     li: ({ children }: any) => (
       <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal}>
-        <li className="pl-1 leading-relaxed text-white/90">{children}</li>
+        <li className="pl-1 leading-relaxed text-primary/90">{children}</li>
       </MotionReveal>
     ),
     code({ node, inline, className, children, ...props }: any) {
@@ -68,7 +68,7 @@ const AnimatedMarkdown = memo(({ text, shouldAnimate, onReveal }: { text: string
         );
       }
       return (
-        <code className={`${className} bg-white/10 rounded px-1 py-0.5 text-xs md:text-sm font-mono text-brand-200`} {...props}>
+        <code className={`${className} bg-primary/10 rounded px-1 py-0.5 text-xs md:text-sm font-mono text-brand-600 dark:text-brand-300`} {...props}>
           {children}
         </code>
       );
@@ -139,7 +139,7 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1 shadow-lg bg-surface-card text-white/80">
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1 shadow-lg bg-surface-card text-primary/80">
           <User size={20} className="w-5 h-5 md:w-auto md:h-auto" />
         </div>
 
@@ -147,7 +147,7 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
            <div className={`transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
               <Button 
                 variant="outline" 
-                className="text-xs h-7 px-2.5 rounded-full border-white/20 text-white/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
+                className="text-xs h-7 px-2.5 rounded-full border-primary/20 text-primary/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
                 leftIcon={isCopied ? <Check size={12} /> : <Copy size={12} />}
                 onClick={handleCopy}
               >
@@ -155,12 +155,12 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
               </Button>
            </div>
            
-           <div className="bg-surface-card p-4 md:p-6 rounded-2xl border border-white/10 shadow-xl w-full">
-            <div className="prose prose-invert max-w-none text-white/90 leading-relaxed text-base break-words w-full overflow-hidden min-w-0">
+           <div className="bg-surface-card p-4 md:p-6 rounded-2xl border border-primary/10 shadow-xl w-full">
+            <div className="prose prose-invert max-w-none text-primary/90 leading-relaxed text-base break-words w-full overflow-hidden min-w-0">
                {processedText.split('\n').map((line, i) => {
                  if (line.startsWith('> ')) {
                    return (
-                     <blockquote key={i} className="border-l-4 border-brand-500 pl-4 py-1 my-2 bg-white/5 rounded-r italic text-white/70">
+                     <blockquote key={i} className="border-l-4 border-brand-500 pl-4 py-1 my-2 bg-primary/5 rounded-r italic text-primary/70">
                        {line.substring(2)}
                      </blockquote>
                    );
@@ -184,12 +184,12 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
         <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white">
           <div className="w-full h-full p-1.5"><WolfLogo className="w-full h-full text-white" /></div>
         </div>
-        <div className="text-sm font-bold text-white tracking-wide md:hidden">WolfChat</div>
+        <div className="text-sm font-bold text-primary tracking-wide md:hidden">WolfChat</div>
       </div>
 
       <div className="flex-1 px-2 md:px-0 min-w-0 w-full max-w-full">
         
-        <div className="prose prose-invert max-w-none text-white/90 leading-relaxed text-base break-words w-full min-w-0">
+        <div className="prose prose-invert max-w-none text-primary/90 leading-relaxed text-base break-words w-full min-w-0">
           {!message.text ? (
             <TypingIndicator />
           ) : (
@@ -209,7 +209,7 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
           <div className="mt-4 flex items-center gap-3">
             <Button 
               variant="outline" 
-              className="text-xs h-8 px-3 rounded-full border-white/20 text-white/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
+              className="text-xs h-8 px-3 rounded-full border-primary/20 text-primary/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
               leftIcon={isCopied ? <Check size={14} /> : <Copy size={14} />}
               onClick={handleCopy}
             >
@@ -217,7 +217,7 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
             </Button>
             <Button
               variant="outline"
-              className="text-xs h-8 px-3 rounded-full border-white/20 text-white/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
+              className="text-xs h-8 px-3 rounded-full border-primary/20 text-primary/60 hover:text-brand-500 hover:border-brand-500 hover:bg-transparent"
               leftIcon={<RotateCcw size={14} />}
               onClick={handleRegenerate}
             >
@@ -409,7 +409,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
         >
             <button
                 onClick={handleQuoteClick}
-                className="flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-full shadow-2xl border border-white/10 backdrop-blur-md animate-in fade-in zoom-in duration-200"
+                className="flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-full shadow-2xl border border-primary/10 backdrop-blur-md animate-in fade-in zoom-in duration-200"
             >
                 <MessageSquarePlus size={16} />
                 <span className="text-sm font-medium whitespace-nowrap">Perguntar ao WolfChat</span>
@@ -420,8 +420,8 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
 
       {chatTitle && (
         <div className="absolute top-20 md:top-24 left-0 right-0 z-30 flex justify-center pointer-events-none">
-           <div className="bg-surface-main/60 backdrop-blur-xl border border-white/10 px-4 py-1.5 rounded-full shadow-2xl transition-all duration-300">
-              <h2 className="text-[10px] font-bold text-white/50 tracking-[0.2em] uppercase max-w-[200px] truncate">{chatTitle}</h2>
+           <div className="bg-surface-main/60 backdrop-blur-xl border border-primary/10 px-4 py-1.5 rounded-full shadow-2xl transition-all duration-300">
+              <h2 className="text-[10px] font-bold text-primary/50 tracking-[0.2em] uppercase max-w-[200px] truncate">{chatTitle}</h2>
            </div>
         </div>
       )}
@@ -430,7 +430,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
         {showScrollTop && (
           <button
             onClick={handleManualScrollToTop}
-            className="pointer-events-auto p-3 rounded-full bg-surface-card/80 backdrop-blur-md border border-white/10 text-white/70 hover:text-brand-500 hover:border-brand-500 hover:bg-surface-hover shadow-lg transition-all duration-300 hover:scale-110"
+            className="pointer-events-auto p-3 rounded-full bg-surface-card/80 backdrop-blur-md border border-primary/10 text-primary/70 hover:text-brand-500 hover:border-brand-500 hover:bg-surface-hover shadow-lg transition-all duration-300 hover:scale-110"
             aria-label="Rolar para o topo"
           >
             <ArrowUp size={20} />
@@ -439,7 +439,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
         {showScrollBottom && (
           <button
             onClick={handleManualScrollToBottom}
-            className="pointer-events-auto p-3 rounded-full bg-surface-card/80 backdrop-blur-md border border-white/10 text-white/70 hover:text-brand-500 hover:border-brand-500 hover:bg-surface-hover shadow-lg transition-all duration-300 hover:scale-110"
+            className="pointer-events-auto p-3 rounded-full bg-surface-card/80 backdrop-blur-md border border-primary/10 text-primary/70 hover:text-brand-500 hover:border-brand-500 hover:bg-surface-hover shadow-lg transition-all duration-300 hover:scale-110"
             aria-label="Rolar para o fim"
           >
             <ArrowDown size={20} />
@@ -461,10 +461,10 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
                  </div>
              </div>
              
-             <h1 className="text-3xl md:text-4xl text-white mb-2 md:mb-4 font-black tracking-tight">
+             <h1 className="text-3xl md:text-4xl text-primary mb-2 md:mb-4 font-black tracking-tight">
                 WolfChat
              </h1>
-             <p className="text-white/60 max-w-lg mb-6 md:mb-12 text-base md:text-xl leading-relaxed">
+             <p className="text-primary/60 max-w-lg mb-6 md:mb-12 text-base md:text-xl leading-relaxed">
                 Seu assistente de IA avançado. <br />
                 <span className="text-brand-500 font-semibold">O que vamos criar juntos?</span>
              </p>
@@ -479,7 +479,7 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
                   <button 
                     key={index}
                     onClick={() => onPromptClick(item.text)}
-                    className="flex flex-col items-center gap-2 md:gap-3 flex-1 min-w-0 text-center p-3 md:p-6 rounded-2xl bg-surface-card border border-white/10 text-white/90 hover:border-brand-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                    className="flex flex-col items-center gap-2 md:gap-3 flex-1 min-w-0 text-center p-3 md:p-6 rounded-2xl bg-surface-card border border-primary/10 text-primary/90 hover:border-brand-500 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
                   >
                     <item.icon size={20} className="text-brand-500 md:mb-1 w-5 h-5 md:w-6 md:h-6" />
                     <span className="text-xs md:text-base font-medium leading-snug truncate w-full">{item.text}</span>

@@ -300,7 +300,7 @@ function App() {
   }, [messages, currentChatId, updateChatMessages, selectedModel, groqApiKey, geminiApiKey, openRouterApiKey, isImmersive, selectedLanguage, handleStopGeneration, isGenerating]);
 
   return (
-    <div className="flex h-full bg-surface-main overflow-hidden text-white font-sans selection:bg-brand-500/30">
+    <div className="flex h-full bg-surface-main overflow-hidden text-primary font-sans selection:bg-brand-500/30">
       <Sidebar 
         isSidebarOpen={isSidebarOpen} 
         setIsSidebarOpen={setIsSidebarOpen} 

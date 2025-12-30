@@ -126,7 +126,7 @@ export const Sidebar = memo(({
   );
 
   const toggleButtonClass = useMemo(() => 
-    `hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 hover:bg-brand-500 text-white transition-all absolute top-1/2 -translate-y-1/2 ${isCollapsed ? "right-1/2 translate-x-1/2" : "right-5"}`,
+    `hidden lg:flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 hover:bg-brand-500 text-primary hover:text-white transition-all absolute top-1/2 -translate-y-1/2 ${isCollapsed ? "right-1/2 translate-x-1/2" : "right-5"}`,
     [isCollapsed]
   );
 
@@ -147,7 +147,7 @@ export const Sidebar = memo(({
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 lg:left-auto lg:inset-y-auto lg:relative z-40 transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] bg-surface-card lg:m-4 lg:rounded-2xl lg:shadow-2xl overflow-hidden flex flex-col lg:h-[calc(100vh-32px)] border-r border-white/5 ${mobileTransform}`}
+        className={`fixed inset-y-0 left-0 lg:left-auto lg:inset-y-auto lg:relative z-40 transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] bg-surface-card lg:m-4 lg:rounded-2xl lg:shadow-2xl overflow-hidden flex flex-col lg:h-[calc(100vh-32px)] border-r border-primary/5 ${mobileTransform}`}
         style={sidebarStyle}
       >
       <div className="flex items-center justify-between p-4 lg:p-5 relative min-h-[60px] lg:min-h-[80px]">
@@ -156,7 +156,7 @@ export const Sidebar = memo(({
             <WolfLogo className="w-full h-full text-white" />
           </div>
           <div className="mt-2 flex flex-col justify-center gap-0.5">
-            <h1 className="font-extrabold text-xl tracking-tight text-white leading-none">WolfChat</h1>
+            <h1 className="font-extrabold text-xl tracking-tight text-primary leading-none">WolfChat</h1>
             <span className="text-xs font-semibold text-brand-500 tracking-wider">PRO</span>
           </div>
         </div>
@@ -166,7 +166,7 @@ export const Sidebar = memo(({
         </button>
 
         <button
-          className="lg:hidden absolute right-5 top-1/2 -translate-y-1/2 text-white/70 hover:text-white"
+          className="lg:hidden absolute right-5 top-1/2 -translate-y-1/2 text-primary/70 hover:text-primary"
           onClick={handleCloseSidebar}
         >
           <ChevronLeft size={24} />
@@ -181,13 +181,13 @@ export const Sidebar = memo(({
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-thumb-surface-hover scrollbar-track-transparent">
-        <div className={`px-4 py-2 text-xs font-bold text-white/30 uppercase tracking-wider mb-2 ${isCollapsed ? "hidden" : ""}`}>
+        <div className={`px-4 py-2 text-xs font-bold text-primary/30 uppercase tracking-wider mb-2 ${isCollapsed ? "hidden" : ""}`}>
           Recentes
         </div>
         
         <div className="space-y-1">
           {chatHistory.length === 0 ? (
-            <div className={`px-4 py-4 text-center text-xs text-white/30 italic ${isCollapsed ? "hidden" : ""}`}>
+            <div className={`px-4 py-4 text-center text-xs text-primary/30 italic ${isCollapsed ? "hidden" : ""}`}>
               Nenhum chat recente
             </div>
           ) : chatHistory.map((chat) => (
@@ -212,19 +212,19 @@ export const Sidebar = memo(({
         </div>
       </div>
 
-      <div className="p-4 border-t border-white/5 bg-black/20 mt-auto">
+      <div className="p-4 border-t border-primary/5 bg-primary/5 mt-auto">
         <div className={`flex items-center gap-3 ${isCollapsed ? "flex-col" : ""}`}>
           <div className={`flex items-center gap-3 flex-1 ${isCollapsed ? "justify-center" : ""}`}>
             <div className="w-9 h-9 rounded-full bg-brand-500 flex items-center justify-center text-white shrink-0">
               <User size={18} />
             </div>
             <div className={`flex-1 overflow-hidden transition-opacity duration-300 ${isCollapsed ? "hidden" : "block"}`}>
-              <div className="text-sm font-semibold text-white">{userName}</div>
+              <div className="text-sm font-semibold text-primary">{userName || 'Usuário'}</div>
             </div>
           </div>
           <button 
             onClick={handleOpenSettings}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center text-white/50 hover:text-white hover:bg-brand-500 transition-all duration-300 ${isCollapsed ? "" : "shrink-0"}`}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center text-primary/50 hover:text-white hover:bg-brand-500 transition-all duration-300 ${isCollapsed ? "" : "shrink-0"}`}
           >
             <Settings size={18} />
           </button>

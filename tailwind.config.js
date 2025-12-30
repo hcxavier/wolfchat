@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -23,14 +24,16 @@ export default {
           900: '#7a0026',
         },
         surface: {
-          main: '#2b2c30',
-          card: '#35313b',
-          input: '#453745',
-          hover: '#3e3945',
+          main: 'rgb(var(--surface-main) / <alpha-value>)',
+          card: 'rgb(var(--surface-card) / <alpha-value>)',
+          input: 'rgb(var(--surface-input) / <alpha-value>)',
+          hover: 'rgb(var(--surface-hover) / <alpha-value>)',
         },
+        primary: 'rgb(var(--text-primary) / <alpha-value>)',
+        secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
         accent: {
-          light: '#613c4c',
-          dark: '#1e1e20',
+          light: 'rgb(var(--accent-light) / <alpha-value>)',
+          dark: 'rgb(var(--accent-dark) / <alpha-value>)',
         }
       },
       animation: {

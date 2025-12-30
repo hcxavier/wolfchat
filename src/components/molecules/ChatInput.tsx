@@ -128,12 +128,12 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
           <div className="mb-2 mx-2 p-3 bg-surface-card/80 backdrop-blur-md border-l-4 border-brand-500 rounded-r-lg shadow-lg flex items-start gap-3 animate-in slide-in-from-bottom-2 duration-300">
              <Quote className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
              <div className="flex-1 min-w-0">
-               <p className="text-sm font-medium text-brand-200 mb-0.5">Citando trecho no context</p>
-               <p className="text-white/70 text-sm line-clamp-2 italic">{quotedText}</p>
+               <p className="text-sm font-medium text-brand-500 mb-0.5">Citando trecho no context</p>
+               <p className="text-primary/70 text-sm line-clamp-2 italic">{quotedText}</p>
              </div>
              <button 
                onClick={onClearQuote}
-               className="p-1 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-colors"
+               className="p-1 hover:bg-primary/5 rounded-full text-primary/40 hover:text-primary transition-colors"
              >
                <X size={14} />
              </button>
@@ -152,7 +152,7 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
             initial={{ height: 60 }}
             animate={{ height: textareaHeight }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="peer w-full bg-surface-input/50 border border-transparent hover:bg-surface-input hover:border-white/20 focus:bg-surface-input focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-white placeholder-transparent text-sm md:text-base resize-none outline-none shadow-xl overflow-y-auto no-scrollbar min-h-[60px] max-h-[200px]"
+            className="peer w-full bg-surface-input/50 border border-transparent hover:bg-surface-input hover:border-primary/20 focus:bg-surface-input focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-primary placeholder-transparent text-sm md:text-base resize-none outline-none shadow-xl overflow-y-auto no-scrollbar min-h-[60px] max-h-[200px]"
             rows={1}
             disabled={isGenerating}
           />
@@ -162,17 +162,16 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
             value={value}
             readOnly
             aria-hidden
-            className="absolute -z-50 invisible w-full bg-transparent border border-transparent rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-white text-sm md:text-base resize-none outline-none min-h-[60px] max-h-[200px] overflow-hidden"
+            className="absolute -z-50 invisible w-full bg-transparent border border-transparent rounded-2xl pl-5 pr-14 md:pr-28 py-5 text-primary text-sm md:text-base resize-none outline-none min-h-[60px] max-h-[200px] overflow-hidden"
             rows={1}
           />
           <label
             htmlFor="chat-input"
-            className="absolute left-4 top-5 px-1 text-sm md:text-base text-white/40 transition-opacity duration-200 opacity-0 peer-placeholder-shown:opacity-100 pointer-events-none"
+            className="absolute left-4 top-5 px-1 text-sm md:text-base text-primary/40 transition-opacity duration-200 opacity-0 peer-placeholder-shown:opacity-100 pointer-events-none"
           >
             Envie uma mensagem...
           </label>
           <div className="absolute right-3 bottom-5 flex items-center gap-2">
-
 
             
             {isGenerating ? (
@@ -197,7 +196,7 @@ export const ChatInput = memo(({ onSendMessage, prefilledValue, isGenerating, on
           </div>
 
         </div>
-        <p className="text-[10px] md:text-xs text-white/40 text-center mt-1 font-medium max-w-[90%] mx-auto leading-tight">
+        <p className="text-[10px] md:text-xs text-primary/40 text-center mt-1 font-medium max-w-[90%] mx-auto leading-tight">
           {"O WolfChat pode gerar informações incorretas."}
         </p>
       </div>
