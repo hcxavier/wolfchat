@@ -5,12 +5,15 @@ import './App.css'
 import App from './App.tsx'
 import { SettingsProvider } from './hooks/useSettings.tsx'
 import { ThemeProvider } from './contexts/ThemeContext.tsx'
+import { AlertProvider } from './contexts/AlertContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SettingsProvider>
       <ThemeProvider>
-        <App />
+        <AlertProvider>
+          <App />
+        </AlertProvider>
       </ThemeProvider>
     </SettingsProvider>
   </StrictMode>,

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, memo, useCallback, useMemo } from 'react';
 import type { ChatSession } from '../../types/chat';
 import { useUserSettings, useSettingsModal } from '../../hooks/useSettings';
 import { ChatItem } from '../molecules/ChatItem';
+import { useAlert } from '../../contexts/AlertContext';
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -14,7 +15,6 @@ interface SidebarProps {
   onSelectChat: (chat: ChatSession) => void;
   onDeleteChat: (chatId: string) => void;
   onRenameChat: (chatId: string, newTitle: string) => void;
-
 }
 
 export const Sidebar = memo(({ 
@@ -29,6 +29,7 @@ export const Sidebar = memo(({
 }: SidebarProps) => {
   const { userName } = useUserSettings();
   const { setShowSettings } = useSettingsModal();
+  const { showConfirm } = useAlert();
   const [isMobile, setIsMobile] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
@@ -68,13 +69,17 @@ export const Sidebar = memo(({
     setMenuOpenId(null);
   }, []);
 
-  const handleDelete = useCallback((chatId: string, e: React.MouseEvent) => {
+  const handleDelete = useCallback(async (chatId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this chat?')) {
+    const confirmed = await showConfirm(
+      'Tem certeza que deseja apagar este chat?',
+      { title: 'Apagar Chat', type: 'warning', confirmText: 'Apagar', cancelText: 'Cancelar' }
+    );
+    if (confirmed) {
       onDeleteChat(chatId);
     }
     setMenuOpenId(null);
-  }, [onDeleteChat]);
+  }, [onDeleteChat, showConfirm]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent, chatId: string) => {
     e.stopPropagation();

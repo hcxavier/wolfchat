@@ -4,6 +4,7 @@ import { Button } from '../atoms/Buttons';
 import { useSettingsModal, useApiKeys, useModelSettings, useUserSettings, useSettingsActions } from '../../hooks/useSettings';
 import { useTheme } from '../../contexts/ThemeContext';
 import { ModelsModal } from './ModelsModal';
+import { useAlert } from '../../contexts/AlertContext';
 
 interface SettingsModalProps {
   onClearAllChats: () => void;
@@ -16,6 +17,7 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
   const { userName, setUserName } = useUserSettings();
   const { saveSettings } = useSettingsActions();
   const { theme, setTheme } = useTheme();
+  const { showConfirm } = useAlert();
   const [showApiKeys, setShowApiKeys] = useState(false);
   const [showModels, setShowModels] = useState(false);
 
@@ -191,8 +193,12 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
 
           <div className="pt-4 border-t border-primary/10">
             <button
-              onClick={() => {
-                if (confirm('Tem certeza que deseja excluir todos os chats? Esta ação não pode ser desfeita.')) {
+              onClick={async () => {
+                const confirmed = await showConfirm(
+                  'Tem certeza que deseja excluir todos os chats? Esta ação não pode ser desfeita.', 
+                  { title: 'Excluir todos os chats', type: 'warning', confirmText: 'Excluir', cancelText: 'Cancelar' }
+                );
+                if (confirmed) {
                   onClearAllChats();
                 }
               }}
