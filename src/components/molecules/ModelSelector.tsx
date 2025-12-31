@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { availableModels, modelAliases } from '../../utils/constants';
 import { Button } from '../atoms/Buttons';
+import { useModelSettings } from '../../hooks/useSettings';
 
 interface ModelSelectorProps {
   selectedModel: string;
@@ -11,6 +12,7 @@ interface ModelSelectorProps {
 export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { customModels } = useModelSettings();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -22,11 +24,21 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const allModels = useMemo(() => {
+    return [...availableModels, ...customModels.map(m => m.id)];
+  }, [customModels]);
+
   const getModelName = (modelId: string) => {
-    return modelAliases[modelId] || modelId.replace(/^(groq\/|openrouter\/|gemini\/)/, '');
+    if (modelAliases[modelId]) return modelAliases[modelId];
+    const custom = customModels.find(m => m.id === modelId);
+    if (custom) return custom.name;
+    return modelId.replace(/^(groq\/|openrouter\/|gemini\/)/, '');
   };
 
   const getProviderName = (modelId: string) => {
+    const custom = customModels.find(m => m.id === modelId);
+    if (custom) return custom.provider.toUpperCase();
+
     if (modelId.startsWith('gemini/')) return 'GOOGLE';
     if (modelId.startsWith('groq/')) return 'GROQ';
     if (modelId.startsWith('openrouter/')) return 'OPENROUTER';
@@ -56,7 +68,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
 
       {isOpen && (
         <div className="absolute top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-surface-card border border-primary/10 rounded-xl shadow-xl overflow-hidden z-50 py-1 max-h-[400px] overflow-y-auto">
-          {availableModels.map((model) => (
+          {allModels.map((model) => (
             <button 
               key={model} 
               className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between hover:bg-surface-hover ${selectedModel === model ? 'bg-primary/5 text-primary' : 'text-primary/70'}`}

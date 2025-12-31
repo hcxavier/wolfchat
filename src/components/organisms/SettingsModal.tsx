@@ -3,6 +3,7 @@ import { X, Trash2, ChevronRight, ArrowLeft } from 'lucide-react';
 import { Button } from '../atoms/Buttons';
 import { useSettingsModal, useApiKeys, useModelSettings, useUserSettings, useSettingsActions } from '../../hooks/useSettings';
 import { useTheme } from '../../contexts/ThemeContext';
+import { ModelsModal } from './ModelsModal';
 
 interface SettingsModalProps {
   onClearAllChats: () => void;
@@ -16,6 +17,7 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
   const { saveSettings } = useSettingsActions();
   const { theme, setTheme } = useTheme();
   const [showApiKeys, setShowApiKeys] = useState(false);
+  const [showModels, setShowModels] = useState(false);
 
   if (!showSettings) return null;
 
@@ -99,6 +101,15 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
                 <ChevronRight size={16} />
               </span>
             </button>
+            <button
+              onClick={() => setShowModels(true)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-surface-main/50 border border-primary/10 rounded-xl hover:bg-surface-main transition-all text-left group"
+            >
+              <span className="text-sm font-medium text-primary/80">Gerenciar Modelos</span>
+              <span className="text-primary/50 group-hover:text-primary transition-colors">
+                <ChevronRight size={16} />
+              </span>
+            </button>
           </div>
 
 
@@ -160,6 +171,8 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
                </div>
             </div>
           )}
+
+          {showModels && <ModelsModal onClose={() => setShowModels(false)} />}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-primary/80">Idioma da Resposta</label>

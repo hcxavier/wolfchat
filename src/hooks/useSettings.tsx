@@ -2,6 +2,12 @@ import { useState, createContext, useContext, useCallback, useMemo, useEffect, t
 import { availableModels } from '../utils/constants';
 import { db } from '../db/dexie';
 
+export interface CustomModel {
+  id: string;
+  name: string;
+  provider: string;
+}
+
 interface ModalContextType {
   showSettings: boolean;
   setShowSettings: (show: boolean) => void;
@@ -21,6 +27,9 @@ interface ModelContextType {
   setSelectedModel: (model: string) => void;
   selectedLanguage: string;
   setSelectedLanguage: (language: string) => void;
+  customModels: CustomModel[];
+  addCustomModel: (model: CustomModel) => void;
+  removeCustomModel: (id: string) => void;
 }
 
 interface UserContextType {
@@ -48,6 +57,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const [selectedModel, setSelectedModelState] = useState<string>('groq/moonshotai/kimi-k2-instruct-0905');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('default');
   const [userName, setUserName] = useState<string>('Usuário');
+  const [customModels, setCustomModels] = useState<CustomModel[]>([]);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -61,13 +71,14 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         
         if (settingsMap.has('selectedModel')) {
           const savedModel = settingsMap.get('selectedModel');
-          if (availableModels.includes(savedModel)) {
+          if (availableModels.includes(savedModel) || settingsMap.get('customModels')?.some((m: CustomModel) => m.id === savedModel)) {
             setSelectedModelState(savedModel);
           }
         }
         
         if (settingsMap.has('selectedLanguage')) setSelectedLanguage(settingsMap.get('selectedLanguage'));
         if (settingsMap.has('userName')) setUserName(settingsMap.get('userName'));
+        if (settingsMap.has('customModels')) setCustomModels(settingsMap.get('customModels'));
       } catch (error) {
         console.error('Failed to load settings from DB:', error);
       }
@@ -82,13 +93,14 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         { key: 'groqApiKey', value: groqApiKey },
         { key: 'geminiApiKey', value: geminiApiKey },
         { key: 'selectedLanguage', value: selectedLanguage },
-        { key: 'userName', value: userName }
+        { key: 'userName', value: userName },
+        { key: 'customModels', value: customModels }
       ]);
       setShowSettings(false);
     } catch (error) {
       console.error('Failed to save settings to DB:', error);
     }
-  }, [openRouterApiKey, groqApiKey, geminiApiKey, selectedLanguage, userName]);
+  }, [openRouterApiKey, groqApiKey, geminiApiKey, selectedLanguage, userName, customModels]);
 
   const setSelectedModel = useCallback((model: string) => {
     setSelectedModelState(model);
@@ -96,6 +108,18 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       console.error('Failed to save selectedModel:', err);
     });
   }, []);
+
+  const addCustomModel = useCallback((model: CustomModel) => {
+    const updatedModels = [...customModels, model];
+    setCustomModels(updatedModels);
+  }, [customModels]);
+
+  const removeCustomModel = useCallback((id: string) => {
+    setCustomModels(prev => prev.filter(m => m.id !== id));
+    if (selectedModel === id) {
+      setSelectedModelState(availableModels[0]);
+    }
+  }, [selectedModel]);
 
   const modalValue = useMemo(() => ({ showSettings, setShowSettings }), [showSettings]);
   
@@ -107,8 +131,9 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
 
   const modelValue = useMemo(() => ({
     selectedModel, setSelectedModel,
-    selectedLanguage, setSelectedLanguage
-  }), [selectedModel, selectedLanguage, setSelectedModel]);
+    selectedLanguage, setSelectedLanguage,
+    customModels, addCustomModel, removeCustomModel
+  }), [selectedModel, selectedLanguage, setSelectedModel, customModels, addCustomModel, removeCustomModel]);
 
   const userValue = useMemo(() => ({ userName, setUserName }), [userName]);
 
