@@ -14,6 +14,9 @@ import { ThinkingBubble } from '../atoms/ThinkingBubble';
 import { MotionReveal } from '../atoms/MotionReveal';
 
 
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+
 const AnimatedMarkdown = memo(({ text, shouldAnimate, onReveal }: { text: string; shouldAnimate: boolean; onReveal?: (el: HTMLElement) => void }) => {
   const components = useMemo(() => ({
     hr: () => (
@@ -73,10 +76,30 @@ const AnimatedMarkdown = memo(({ text, shouldAnimate, onReveal }: { text: string
           {children}
         </code>
       );
-    }
+    },
+    table: ({ children }: any) => (
+      <MotionReveal shouldAnimate={shouldAnimate} delayIndex={0} onReveal={onReveal} className="w-full overflow-x-auto my-4 rounded-lg border border-primary/10">
+          <table className="w-full border-collapse bg-primary/5">
+              {children}
+          </table>
+      </MotionReveal>
+    ),
+    thead: ({ children }: any) => <thead className="bg-primary/5">{children}</thead>,
+    tbody: ({ children }: any) => <tbody>{children}</tbody>,
+    tr: ({ children }: any) => <tr className="border-b border-primary/5 last:border-0 hover:bg-primary/5 transition-colors">{children}</tr>,
+    th: ({ children }: any) => <th className="p-3 text-left text-xs md:text-sm font-semibold text-indigo-600 dark:text-indigo-300 uppercase tracking-wider">{children}</th>,
+    td: ({ children }: any) => <td className="p-3 text-sm text-primary/80 border-l border-primary/5 first:border-0">{children}</td>,
   }), [shouldAnimate, onReveal]);
 
-  return <ReactMarkdown components={components}>{text}</ReactMarkdown>;
+  return (
+    <ReactMarkdown 
+      remarkPlugins={[remarkGfm]} 
+      rehypePlugins={[rehypeRaw]} 
+      components={components}
+    >
+      {text}
+    </ReactMarkdown>
+  );
 });
 
 
