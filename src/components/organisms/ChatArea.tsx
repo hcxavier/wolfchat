@@ -10,6 +10,7 @@ import Logger from '../../utils/logger';
 import ReactMarkdown from 'react-markdown';
 import { CodeBlock } from '../atoms/CodeBlock';
 import { SophisticatedHr } from '../atoms/SophisticatedHr';
+import { ThinkingBubble } from '../atoms/ThinkingBubble';
 import { MotionReveal } from '../atoms/MotionReveal';
 
 
@@ -189,8 +190,10 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
 
       <div className="flex-1 px-2 md:px-0 min-w-0 w-full max-w-full">
         
+        {message.reasoning && <ThinkingBubble reasoning={message.reasoning} />}
+
         <div className="prose prose-invert max-w-none text-primary/90 leading-relaxed text-base break-words w-full min-w-0">
-          {!message.text ? (
+          {!message.text && !message.reasoning ? (
             <TypingIndicator />
           ) : (
             <>

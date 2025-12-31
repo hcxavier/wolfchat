@@ -3,6 +3,7 @@ export interface Message {
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+  reasoning?: string;
 }
 
 export interface ChatSession {

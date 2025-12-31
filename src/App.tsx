@@ -145,20 +145,23 @@ function App() {
   
     try {
       let currentResponse = "";
+      let currentReasoning = "";
       
-      await sendMessageToApi(
+      const { text: finalResponse, reasoning: finalReasoning } = await sendMessageToApi(
         updatedMessages, 
         selectedModel, 
         currentApiKey, 
         isImmersive, 
         selectedLanguage,
         abortController.signal,
-        (chunk) => {
-          currentResponse += chunk;
+        (chunk, reasoningChunk) => {
+          if (chunk) currentResponse += chunk;
+          if (reasoningChunk) currentReasoning += reasoningChunk;
+
           setMessages((previousState: Message[]) => {
             const newMessages = previousState.map((message: Message) =>
               message.id === botThinkingMessageId
-                ? { ...message, text: currentResponse }
+                ? { ...message, text: currentResponse, reasoning: currentReasoning }
                 : message
             );
             return newMessages;
@@ -169,7 +172,7 @@ function App() {
       setMessages((previousState: Message[]) => {
         const newMessages = previousState.map((message: Message) =>
           message.id === botThinkingMessageId
-            ? { ...message, text: currentResponse }
+            ? { ...message, text: finalResponse, reasoning: finalReasoning }
             : message
         );
         if (activeChatId) {
@@ -263,21 +266,25 @@ function App() {
 
     try {
         let currentResponse = "";
-        await sendMessageToApi(
+        let currentReasoning = "";
+
+        const { text: finalResponse, reasoning: finalReasoning } = await sendMessageToApi(
             truncatedMessages,
             selectedModel,
             currentApiKey,
             isImmersive,
             selectedLanguage,
             abortController.signal,
-            (chunk) => {
-                 currentResponse += chunk;
-                 setMessages(prev => prev.map(m => m.id === botThinkingMessageId ? { ...m, text: currentResponse } : m));
+            (chunk, reasoningChunk) => {
+                 if (chunk) currentResponse += chunk;
+                 if (reasoningChunk) currentReasoning += reasoningChunk;
+
+                 setMessages(prev => prev.map(m => m.id === botThinkingMessageId ? { ...m, text: currentResponse, reasoning: currentReasoning } : m));
             }
         );
         
         setMessages(prev => {
-            const newMessages = prev.map(m => m.id === botThinkingMessageId ? { ...m, text: currentResponse } : m);
+            const newMessages = prev.map(m => m.id === botThinkingMessageId ? { ...m, text: finalResponse, reasoning: finalReasoning } : m);
             if (currentChatId) updateChatMessages(currentChatId, newMessages);
             return newMessages;
         });

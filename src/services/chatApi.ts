@@ -8,8 +8,8 @@ export const sendMessageToApi = async (
   isImmersive: boolean = false,
   selectedLanguage: string = 'default',
   signal?: AbortSignal,
-  onChunk?: (chunk: string) => void
-): Promise<string> => {
+  onChunk?: (chunk: string, reasoningChunk?: string) => void
+): Promise<{ text: string; reasoning: string }> => {
   const isGroq = selectedModel.startsWith('groq/');
   const isGemini = selectedModel.startsWith('gemini/');
   let apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
@@ -96,9 +96,9 @@ This ensures correct syntax highlighting and indentation preservation.
 
       const rawContent = response.text || '';
       
-      if (onChunk) onChunk(rawContent);
+      if (onChunk) onChunk(rawContent, '');
       
-      return rawContent;
+      return { text: rawContent, reasoning: '' };
 
     } catch (error: any) {
        if (error.message && (error.message.includes('429') || error.status === 429)) {
@@ -146,6 +146,7 @@ This ensures correct syntax highlighting and indentation preservation.
   const reader = response.body?.getReader();
   const decoder = new TextDecoder();
   let fullContent = '';
+  let fullReasoning = '';
 
   if (reader) {
     try {
@@ -161,7 +162,7 @@ This ensures correct syntax highlighting and indentation preservation.
 
         for (const line of lines) {
           if (line.trim() === '') continue;
-          if (line === 'data: [DONE]') return fullContent;
+          if (line === 'data: [DONE]') return { text: fullContent, reasoning: fullReasoning };
           
           if (line.startsWith('data: ')) {
             try {
@@ -171,9 +172,9 @@ This ensures correct syntax highlighting and indentation preservation.
               const reasoning = delta?.reasoning_content || delta?.reasoning || '';
               
               if (content || reasoning) {
-                const textChunk = (reasoning ? `\n> *Thinking: ${reasoning}*\n` : '') + content;
-                fullContent += textChunk;
-                if (onChunk) onChunk(textChunk);
+                fullContent += content;
+                fullReasoning += reasoning;
+                if (onChunk) onChunk(content, reasoning);
               }
             } catch (e) {
               console.error('Error parsing SSE message', e);
@@ -189,7 +190,7 @@ This ensures correct syntax highlighting and indentation preservation.
     }
   }
 
-  return fullContent;
+  return { text: fullContent, reasoning: fullReasoning };
 };
 
 export const generateChatTitle = async (
