@@ -29,7 +29,7 @@ export const AlertModal = ({
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // ... (keep useEffect)
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();

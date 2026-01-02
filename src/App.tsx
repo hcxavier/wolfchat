@@ -4,6 +4,7 @@ import { Header } from './components/organisms/Header';
 import { ChatArea } from './components/organisms/ChatArea';
 import { ChatInput } from './components/molecules/ChatInput';
 import { SettingsModal } from './components/organisms/SettingsModal';
+import { SearchModal } from './components/organisms/SearchModal';
 
 import { useChat } from './hooks/useChat';
 import { useApiKeys, useModelSettings } from './hooks/useSettings';
@@ -35,6 +36,7 @@ function App() {
   const [quotedText, setQuotedText] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
   const [isImmersive, setIsImmersive] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     migrateFromLocalStorage();
@@ -79,6 +81,11 @@ function App() {
       if (e.altKey && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         handleNewChat();
+      }
+      
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
       }
     };
 
@@ -315,9 +322,10 @@ function App() {
         currentChatId={currentChatId} 
         onNewChat={handleNewChat} 
         onSelectChat={handleSelectChat}
+
         onDeleteChat={deleteChat}
         onRenameChat={renameChat}
-
+        onSearchClick={() => setIsSearchOpen(true)}
       />
 
       <div className="flex flex-1 overflow-hidden relative transition-all duration-500 ease-out">
@@ -354,6 +362,12 @@ function App() {
       </div>
 
       <SettingsModal onClearAllChats={clearAllChats} />
+      <SearchModal 
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        chatHistory={chatHistory}
+        onSelectChat={handleSelectChat}
+      />
     </div>
   );
 }

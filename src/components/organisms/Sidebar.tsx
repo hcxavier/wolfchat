@@ -1,4 +1,4 @@
-import { Plus, Settings, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Settings, User, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { WolfLogo } from '../atoms/WolfLogo';
 import { useState, useEffect, useRef, memo, useCallback, useMemo } from 'react';
 import type { ChatSession } from '../../types/chat';
@@ -15,6 +15,7 @@ interface SidebarProps {
   onSelectChat: (chat: ChatSession) => void;
   onDeleteChat: (chatId: string) => void;
   onRenameChat: (chatId: string, newTitle: string) => void;
+  onSearchClick: () => void;
 }
 
 export const Sidebar = memo(({ 
@@ -26,6 +27,7 @@ export const Sidebar = memo(({
   onSelectChat,
   onDeleteChat,
   onRenameChat,
+  onSearchClick,
 }: SidebarProps) => {
   const { userName } = useUserSettings();
   const { setShowSettings } = useSettingsModal();
@@ -36,6 +38,16 @@ export const Sidebar = memo(({
   const [editingTitle, setEditingTitle] = useState("");
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) return chatHistory;
+    const query = searchQuery.toLowerCase();
+    return chatHistory.filter((chat) => 
+      chat.title.toLowerCase().includes(query) || 
+      chat.messages.some(m => m.text.toLowerCase().includes(query))
+    );
+  }, [chatHistory, searchQuery]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -43,6 +55,17 @@ export const Sidebar = memo(({
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        onSearchClick();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onSearchClick]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -178,7 +201,38 @@ export const Sidebar = memo(({
         </button>
       </div>
 
-      <div className="px-4 lg:px-5 pb-4 lg:pb-6 pt-2">
+      <div className="px-4 lg:px-5 pb-4 lg:pb-6 pt-2 space-y-3">
+        {isCollapsed ? (
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="w-full h-10 flex items-center justify-center rounded-xl bg-primary/5 text-primary/60 hover:text-primary hover:bg-primary/10 transition-all"
+            title="Buscar"
+          >
+            <Search size={18} />
+          </button>
+        ) : (
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search size={16} className="text-primary/40 group-focus-within:text-brand-500 transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar nas conversas..."
+              className="w-full py-2.5 pl-9 pr-8 bg-primary/5 hover:bg-primary/10 focus:bg-white dark:focus:bg-surface-card border-none rounded-xl text-sm transition-all outline-none focus:ring-2 focus:ring-brand-500/20 text-primary placeholder:text-primary/40"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-primary/40 hover:text-primary transition-colors cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        )}
+
         <button onClick={onNewChat} className={newChatButtonClass}>
           <Plus size={20} />
           <span className={`transition-opacity duration-300 ${isCollapsed ? "hidden" : "block"}`}>Novo Chat</span>
@@ -187,15 +241,15 @@ export const Sidebar = memo(({
 
       <div className="flex-1 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-thumb-surface-hover scrollbar-track-transparent">
         <div className={`px-4 py-2 text-xs font-bold text-primary/30 uppercase tracking-wider mb-2 ${isCollapsed ? "hidden" : ""}`}>
-          Recentes
+          {searchQuery ? 'Resultados' : 'Recentes'}
         </div>
         
         <div className="space-y-1">
-          {chatHistory.length === 0 ? (
+          {filteredChats.length === 0 ? (
             <div className={`px-4 py-4 text-center text-xs text-primary/30 italic ${isCollapsed ? "hidden" : ""}`}>
-              Nenhum chat recente
+              {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhum chat recente'}
             </div>
-          ) : chatHistory.map((chat) => (
+          ) : filteredChats.map((chat) => (
             <ChatItem
               key={chat.id}
               chat={chat}
