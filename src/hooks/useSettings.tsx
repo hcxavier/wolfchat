@@ -35,6 +35,8 @@ interface ModelContextType {
 interface UserContextType {
   userName: string;
   setUserName: (name: string) => void;
+  systemPrompt: string;
+  setSystemPrompt: (prompt: string) => void;
 }
 
 interface SettingsActionsContextType {
@@ -57,6 +59,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const [selectedModel, setSelectedModelState] = useState<string>('groq/moonshotai/kimi-k2-instruct-0905');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('default');
   const [userName, setUserName] = useState<string>('Usuário');
+  const [systemPrompt, setSystemPrompt] = useState<string>('');
   const [customModels, setCustomModels] = useState<CustomModel[]>([]);
 
   useEffect(() => {
@@ -78,6 +81,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         
         if (settingsMap.has('selectedLanguage')) setSelectedLanguage(settingsMap.get('selectedLanguage'));
         if (settingsMap.has('userName')) setUserName(settingsMap.get('userName'));
+        if (settingsMap.has('systemPrompt')) setSystemPrompt(settingsMap.get('systemPrompt'));
         if (settingsMap.has('customModels')) setCustomModels(settingsMap.get('customModels'));
       } catch (error) {
         console.error('Failed to load settings from DB:', error);
@@ -94,13 +98,14 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         { key: 'geminiApiKey', value: geminiApiKey },
         { key: 'selectedLanguage', value: selectedLanguage },
         { key: 'userName', value: userName },
+        { key: 'systemPrompt', value: systemPrompt },
         { key: 'customModels', value: customModels }
       ]);
       setShowSettings(false);
     } catch (error) {
       console.error('Failed to save settings to DB:', error);
     }
-  }, [openRouterApiKey, groqApiKey, geminiApiKey, selectedLanguage, userName, customModels]);
+  }, [openRouterApiKey, groqApiKey, geminiApiKey, selectedLanguage, userName, systemPrompt, customModels]);
 
   const setSelectedModel = useCallback((model: string) => {
     setSelectedModelState(model);
@@ -135,7 +140,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     customModels, addCustomModel, removeCustomModel
   }), [selectedModel, selectedLanguage, setSelectedModel, customModels, addCustomModel, removeCustomModel]);
 
-  const userValue = useMemo(() => ({ userName, setUserName }), [userName]);
+  const userValue = useMemo(() => ({ userName, setUserName, systemPrompt, setSystemPrompt }), [userName, systemPrompt]);
 
   const actionsValue = useMemo(() => ({ saveSettings }), [saveSettings]);
 

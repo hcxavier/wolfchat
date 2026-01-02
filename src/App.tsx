@@ -7,7 +7,7 @@ import { SettingsModal } from './components/organisms/SettingsModal';
 import { SearchModal } from './components/organisms/SearchModal';
 
 import { useChat } from './hooks/useChat';
-import { useApiKeys, useModelSettings } from './hooks/useSettings';
+import { useApiKeys, useModelSettings, useUserSettings } from './hooks/useSettings';
 import { sendMessageToApi, generateChatTitle } from './services/chatApi';
 
 import type { Message, ChatSession } from './types/chat';
@@ -31,6 +31,7 @@ function App() {
 
   const { openRouterApiKey, groqApiKey, geminiApiKey } = useApiKeys();
   const { selectedModel, selectedLanguage } = useModelSettings();
+  const { systemPrompt } = useUserSettings();
   
   const [prefilledText, setPrefilledText] = useState<string | undefined>(undefined);
   const [quotedText, setQuotedText] = useState<string | null>(null);
@@ -156,10 +157,11 @@ function App() {
       
       const { text: finalResponse, reasoning: finalReasoning } = await sendMessageToApi(
         updatedMessages, 
-        selectedModel, 
+        selectedModel,
         currentApiKey, 
         isImmersive, 
         selectedLanguage,
+        systemPrompt,
         abortController.signal,
         (chunk, reasoningChunk) => {
           if (chunk) currentResponse += chunk;
@@ -281,6 +283,7 @@ function App() {
             currentApiKey,
             isImmersive,
             selectedLanguage,
+            systemPrompt,
             abortController.signal,
             (chunk, reasoningChunk) => {
                  if (chunk) currentResponse += chunk;

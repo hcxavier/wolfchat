@@ -7,6 +7,7 @@ export const sendMessageToApi = async (
   apiKey: string,
   isImmersive: boolean = false,
   selectedLanguage: string = 'default',
+  customSystemPrompt: string = '',
   signal?: AbortSignal,
   onChunk?: (chunk: string, reasoningChunk?: string) => void
 ): Promise<{ text: string; reasoning: string }> => {
@@ -70,7 +71,8 @@ This ensures correct syntax highlighting and indentation preservation.
     baseSystemPrompt += ` Please respond in ${selectedLanguage}.`;
   }
 
-  const systemMessageContent = isImmersive ? baseSystemPrompt + immersiveSystemPrompt : baseSystemPrompt;
+  const systemMessageContent = (isImmersive ? baseSystemPrompt + immersiveSystemPrompt : baseSystemPrompt) + 
+    (customSystemPrompt ? `\n\n[USER CUSTOM INSTRUCTIONS]\n${customSystemPrompt}` : '');
 
   if (isGemini) {
     const ai = new GoogleGenAI({ 
