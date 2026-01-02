@@ -271,7 +271,7 @@ export const Sidebar = memo(({
         </div>
       </div>
 
-      <div className="p-4 border-t border-primary/5 bg-primary/5 mt-auto">
+      <div className="p-4 border-t border-primary/5 bg-primary/5">
         <div className={`flex items-center gap-3 ${isCollapsed ? "flex-col" : ""}`}>
           <div className={`flex items-center gap-3 flex-1 ${isCollapsed ? "justify-center" : ""}`}>
             <div className="w-9 h-9 rounded-full bg-brand-500 flex items-center justify-center text-white shrink-0">

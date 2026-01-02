@@ -92,8 +92,7 @@ export const AlertModal = ({
         className="fixed inset-0 bg-black/40 backdrop-blur-md animate-in fade-in duration-300"
         onClick={onClose}
       />
-      
-      
+
       <div 
         ref={modalRef}
         className="relative w-full max-w-sm bg-surface-card border border-white/10 dark:border-white/5 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden scale-100 animate-in zoom-in-95 slide-in-from-bottom-2 duration-300 text-primary ring-1 ring-white/5"

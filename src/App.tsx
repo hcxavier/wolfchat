@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+
 import { Sidebar } from './components/organisms/Sidebar';
 import { Header } from './components/organisms/Header';
 import { ChatArea } from './components/organisms/ChatArea';
 import { ChatInput } from './components/molecules/ChatInput';
 import { SettingsModal } from './components/organisms/SettingsModal';
 import { SearchModal } from './components/organisms/SearchModal';
+import { DynamicPromptModal } from './components/organisms/DynamicPromptModal';
 
 import { useChat } from './hooks/useChat';
 import { useApiKeys, useModelSettings, useUserSettings } from './hooks/useSettings';
@@ -38,6 +40,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024);
   const [isImmersive, setIsImmersive] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDynamicPromptOpen, setIsDynamicPromptOpen] = useState(false);
 
   useEffect(() => {
     migrateFromLocalStorage();
@@ -46,11 +49,8 @@ function App() {
     });
   }, []);
 
-
   const [isGenerating, setIsGenerating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-
-
 
   const handleImmersiveChange = useCallback((value: boolean) => {
     setIsImmersive(value);
@@ -74,8 +74,6 @@ function App() {
     selectChat(chat);
     if (window.innerWidth < 1024) setIsSidebarOpen(false);
   }, [selectChat]);
-
-
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -102,8 +100,27 @@ function App() {
     if (!text.trim()) return;
   
     let finalMessageText = text;
+
+    const commandMatch = text.match(/^\/([\w-]+)(\s|$)/);
+    if (commandMatch) {
+        const commandName = commandMatch[1].toLowerCase();
+        const prompt = await db.dynamicPrompts.where('command').equals(commandName).first();
+        
+        if (prompt) {
+             let promptContent = prompt.content.trim();
+             if (promptContent.endsWith('.')) {
+                 promptContent = promptContent.slice(0, -1) + ':';
+             } else if (!promptContent.endsWith(':')) {
+                 promptContent += ':';
+             }
+             
+             const restOfText = text.slice(commandMatch[0].length);
+             finalMessageText = `${promptContent} ${restOfText}`.trim();
+        }
+    }
+
     if (quotedText) {
-      finalMessageText = `> ${quotedText}\n\n${text}`;
+      finalMessageText = `> ${quotedText}\n\n${finalMessageText}`;
       setQuotedText(null);
     }
   
@@ -111,7 +128,8 @@ function App() {
       id: Date.now(), 
       text: finalMessageText, 
       sender: 'user', 
-      timestamp: new Date() 
+      timestamp: new Date(),
+      originalUserInput: finalMessageText !== text ? text : undefined 
     };
     
     const updatedMessages = [...messages, userMessage];
@@ -361,15 +379,21 @@ function App() {
           />
         </div>
 
-
       </div>
 
-      <SettingsModal onClearAllChats={clearAllChats} />
+      <SettingsModal 
+        onClearAllChats={clearAllChats} 
+        onOpenDynamicPrompts={() => setIsDynamicPromptOpen(true)}
+      />
       <SearchModal 
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         chatHistory={chatHistory}
         onSelectChat={handleSelectChat}
+      />
+      <DynamicPromptModal 
+        isOpen={isDynamicPromptOpen} 
+        onClose={() => setIsDynamicPromptOpen(false)} 
       />
     </div>
   );

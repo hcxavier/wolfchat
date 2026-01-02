@@ -27,7 +27,6 @@ export const SystemPromptModal = ({ onClose }: SystemPromptModalProps) => {
                 </button>
               </div>
 
-
               <div className="p-6 space-y-6 overflow-y-auto flex-1">
                   
                   <div className="space-y-4">
@@ -54,7 +53,6 @@ export const SystemPromptModal = ({ onClose }: SystemPromptModalProps) => {
                   </div>
 
               </div>
-
 
                <div className="flex justify-end px-6 py-4 border-t border-primary/5 bg-primary/5 shrink-0">
                   <Button onClick={onClose} variant="solid" className="px-6 py-2 h-auto text-xs md:text-sm">

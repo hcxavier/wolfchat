@@ -13,7 +13,6 @@ import { SophisticatedHr } from '../atoms/SophisticatedHr';
 import { ThinkingBubble } from '../atoms/ThinkingBubble';
 import { MotionReveal } from '../atoms/MotionReveal';
 
-
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 
@@ -102,7 +101,6 @@ const AnimatedMarkdown = memo(({ text, shouldAnimate, onReveal }: { text: string
   );
 });
 
-
 interface ChatAreaProps {
   messages: Message[];
   onPromptClick: (text: string) => void;
@@ -126,8 +124,6 @@ const processMessageContent = (text: string): string => {
   return text;
 };
 
-
-
 interface MessageItemProps {
   message: Message;
   isHovered: boolean;
@@ -142,12 +138,12 @@ interface MessageItemProps {
 }
 
 const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onRegenerate, isImmersive, shouldAnimate, onReveal }: MessageItemProps) => {
-  const processedText = useMemo(() => 
-    message.sender === 'bot' && message.text ? processMessageContent(message.text) : message.text,
-    [message.text, message.sender]
-  );
-  
-
+  const processedText = useMemo(() => {
+    if (message.sender === 'bot') {
+       return message.text ? processMessageContent(message.text) : message.text;
+    }
+    return message.originalUserInput || message.text;
+  }, [message.text, message.sender, message.originalUserInput]);
 
   const handleMouseEnter = useCallback(() => onHover(message.id), [message.id, onHover]);
   const handleMouseLeave = useCallback(() => onHover(null), [onHover]);
@@ -189,6 +185,17 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
                      </blockquote>
                    );
                  }
+
+                 const commandMatch = line.match(/^(\/[\w-]+)(\s.*)?$/);
+                 if (commandMatch) {
+                    return (
+                        <p key={i} className="whitespace-pre-wrap mb-2 last:mb-0">
+                            <span className="text-brand-500 font-bold">{commandMatch[1]}</span>
+                            {commandMatch[2]}
+                        </p>
+                    );
+                 }
+
                  return <p key={i} className="whitespace-pre-wrap mb-2 last:mb-0">{line}</p>;
                })}
             </div>
@@ -225,7 +232,6 @@ const MessageItem = memo(({ message, isHovered, isCopied, onHover, onCopy, onReg
               ) : (
                 <AnimatedMarkdown text={processedText} shouldAnimate={shouldAnimate} onReveal={onReveal} />
               )}
-              
 
             </>
           )}
@@ -261,7 +267,6 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [selectionMenu, setSelectionMenu] = useState<{ x: number, y: number, text: string } | null>(null);
 
-  
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -369,17 +374,13 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
          setSelectionMenu(null);
          return;
       }
-      
-      
+
       const range = selection.getRangeAt(0);
       const rects = range.getClientRects();
       if(rects.length === 0) return;
       
       const rect = rects[0]; 
-      
-      
-      
-      
+
       setSelectionMenu({
         x: rect.left + rect.width / 2,
         y: rect.top - 10,
@@ -387,7 +388,6 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
       });
     };
 
-    
     const onMouseUp = () => {
         
         setTimeout(() => {
@@ -417,10 +417,6 @@ export const ChatArea = memo(({ messages, onPromptClick, chatTitle, isImmersive,
       window.getSelection()?.removeAllRanges();
     }
   }, [selectionMenu, onQuote]);
-
-
-
-
 
   return (
     <div className="flex-1 relative w-full h-full max-w-full">

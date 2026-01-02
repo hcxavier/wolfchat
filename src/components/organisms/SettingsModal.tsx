@@ -9,9 +9,10 @@ import { useAlert } from '../../contexts/AlertContext';
 
 interface SettingsModalProps {
   onClearAllChats: () => void;
+  onOpenDynamicPrompts: () => void;
 }
 
-export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
+export const SettingsModal = ({ onClearAllChats, onOpenDynamicPrompts }: SettingsModalProps) => {
   const { showSettings, setShowSettings } = useSettingsModal();
   const { openRouterApiKey, setOpenRouterApiKey, groqApiKey, setGroqApiKey, geminiApiKey, setGeminiApiKey } = useApiKeys();
   const { selectedLanguage, setSelectedLanguage } = useModelSettings();
@@ -123,9 +124,17 @@ export const SettingsModal = ({ onClearAllChats }: SettingsModalProps) => {
                 <ChevronRight size={16} />
               </span>
             </button>
+            <button
+              onClick={onOpenDynamicPrompts}
+              className="w-full flex items-center justify-between px-4 py-3 bg-surface-main/50 border border-primary/10 rounded-xl hover:bg-surface-main transition-all text-left group"
+            >
+              <span className="text-sm font-medium text-primary/80">Prompts Dinâmicos</span>
+              <span className="text-primary/50 group-hover:text-primary transition-colors">
+                <ChevronRight size={16} />
+              </span>
+            </button>
 
           </div>
-
 
           {showApiKeys && (
              <div className="absolute inset-0 z-20 bg-surface-card animate-in slide-in-from-right duration-200 flex flex-col text-primary">

@@ -49,9 +49,7 @@ export const ModelsModal = ({ onClose }: ModelsModalProps) => {
                 </button>
               </div>
 
-
               <div className="p-6 space-y-6 overflow-y-auto flex-1">
-                  
 
                   <div className="space-y-4 p-4 bg-surface-main/30 rounded-xl border border-primary/5">
                       <h3 className="text-sm font-bold text-primary/80">Adicionar Modelo</h3>
@@ -93,7 +91,6 @@ export const ModelsModal = ({ onClose }: ModelsModalProps) => {
                       </div>
                   </div>
 
-
                   <div className="space-y-3">
                       <h3 className="text-sm font-bold text-primary/80">Meus Modelos</h3>
                       {customModels.length === 0 ? (
@@ -120,7 +117,6 @@ export const ModelsModal = ({ onClose }: ModelsModalProps) => {
                   </div>
 
               </div>
-
 
                <div className="flex justify-end px-6 py-4 border-t border-primary/5 bg-primary/5 shrink-0">
                   <Button onClick={onClose} variant="solid" className="px-6 py-2 h-auto text-xs md:text-sm">
